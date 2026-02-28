@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>指板表ジェネレーター</title>
+
+<style>
+  :root{
+    --ui-border:#ddd;
+    --ui-muted:#666;
+
+    --note-stroke:#d5d5d5;
+    --note-stroke-strong:#111;
+
+    /* highlight fills */
+    --fill-scale:#e6f2ff;   /* 水色（お気に入りのまま） */
+    --fill-chord:#ffe6a3;   /* 黄色 */
+    --fill-both:#dff0a6;    /* 黄緑（混色） */
+
+    /* marker colors */
+    --mk-red:#e1524a;
+    --mk-green:#2fb072;
+    --mk-yellow:#e0b100;
+
+    --shadow: 0 10px 30px rgba(0,0,0,.18);
+  }
+
+  body{
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 20px;
+    background:#fff;
+    color:#111;
+  }
+  h1{ margin:0 0 14px; font-size:22px; }
+
+  .card{
+    border:1px solid var(--ui-border);
+    border-radius:14px;
+    padding:12px;
+    padding-bottom:64px; /* 右下固定ボタンの分 */
+    max-width:1200px;
+    background:#fff;
+    position:relative;
+  }
+
+  /* Tabs */
+  .tabs{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .tabBtn{
+    border:1px solid var(--ui-border);
+    background:#fff;
+    border-radius:999px;
+    padding:8px 12px;
+    font-size:14px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .tabBtn[aria-selected="true"]{
+    border-color:#9bbfe6;
+    box-shadow:0 0 0 3px rgba(155,191,230,.25);
+    font-weight:700;
+  }
+
+  .panel{
+    display:none;
+    border-top:1px solid #eee;
+    padding-top:10px;
+  }
+  .panel.active{ display:block; }
+
+  .row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:flex-end;
+    margin:8px 0;
+  }
+
+  label{
+    display:grid;
+    gap:6px;
+    font-size:14px;
+    min-width:140px;
+  }
+
+  select, input, button{
+    font-size:16px;
+    padding:8px 10px;
+    border:1px solid #cfcfcf;
+    border-radius:10px;
+    background:#fff;
+    outline:none;
+  }
+  select:focus, input:focus, button:focus{
+    border-color:#9bbfe6;
+    box-shadow:0 0 0 3px rgba(155,191,230,.25);
+  }
+
+  .btn{ cursor:pointer; }
+  .btnPrimary{ border-color:#9bbfe6; }
+
+  .pillGroup{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .pill{
+    border:1px solid #d5d5d5;
+    background:#fff;
+    border-radius:999px;
+    padding:8px 10px;
+    font-size:14px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .pill[aria-pressed="true"]{
+    border-color:#9bbfe6;
+    box-shadow:0 0 0 3px rgba(155,191,230,.25);
+    font-weight:700;
+  }
+
+  .colorDot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    display:inline-block;
+    vertical-align:-2px;
+    margin-right:6px;
+    border:1px solid rgba(0,0,0,.15);
+  }
+
+  /* Bottom-right PNG button (always visible within tab window) */
+  .exportBtnWrap{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+
+  /* Fretboard */
+  .boardWrap{
+    max-width:1200px;
+    margin-top:14px;
+    border:1px solid #e3e3e3;
+    border-radius:14px;
+    padding:14px;
+    background:#fff;
+    overflow-x:auto;
+  }
+  svg{ display:block; width:100%; height:auto; }
+
+  /* Modal */
+  .modalBack{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    z-index:9999;
+  }
+  .modalBack.show{ display:flex; }
+  .modal{
+    width:min(980px, 100%);
+    background:#fff;
+    border-radius:16px;
+    box-shadow: var(--shadow);
+    border:1px solid rgba(0,0,0,.08);
+    overflow:hidden;
+  }
+  .modalHead{
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid #eee;
+    gap:10px;
+  }
+  .modalTitle{
+    font-weight:800;
+    font-size:14px;
+    color:#111;
+  }
+  .modalBody{
+    padding:14px;
+    display:grid;
+    gap:12px;
+  }
+  .modalActions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .previewImg{
+    width:100%;
+    height:auto;
+    border:1px solid #eee;
+    border-radius:12px;
+    background:#fafafa;
+  }
+
+  @media (max-width:860px){
+    label{ min-width: 46%; }
+  }
+</style>
+</head>
+
+<body>
+<h1>指板表ジェネレーター</h1>
+
+<div class="card">
+  <div class="tabs" role="tablist" aria-label="設定タブ">
+    <button class="tabBtn" role="tab" id="tab-basic" aria-selected="true" aria-controls="panel-basic">基本</button>
+    <button class="tabBtn" role="tab" id="tab-highlight" aria-selected="false" aria-controls="panel-highlight">強調表示</button>
+    <button class="tabBtn" role="tab" id="tab-markshare" aria-selected="false" aria-controls="panel-markshare">マーク＆共有</button>
+  </div>
+
+  <!-- 基本 -->
+  <div class="panel active" id="panel-basic" role="tabpanel" aria-labelledby="tab-basic">
+    <div class="row" id="tuningSelectors"></div>
+
+    <div class="row">
+      <label>最大フレット
+        <input id="maxFret" type="number" min="0" max="24" value="12" />
+      </label>
+
+      <label>表示範囲 開始
+        <input id="viewStart" type="number" min="0" max="24" value="1" />
+      </label>
+
+      <label>表示範囲 終了
+        <input id="viewEnd" type="number" min="0" max="24" value="12" />
+      </label>
+
+      <label>音名表示
+        <select id="showNoteNames">
+          <option value="on">オン</option>
+          <option value="off">オフ</option>
+        </select>
+      </label>
+
+      <label>表記モード
+        <select id="accMode">
+          <option value="sharp">#で統一（C♯）</option>
+          <option value="flat">♭で統一（D♭）</option>
+          <option value="both">両方（C♯/D♭）</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <!-- 強調表示 -->
+  <div class="panel" id="panel-highlight" role="tabpanel" aria-labelledby="tab-highlight">
+    <div class="row">
+      <label>スケール
+        <select id="scaleType">
+          <option value="off">オフ</option>
+          <option value="major">メジャー</option>
+          <option value="minor">ナチュラルマイナー</option>
+        </select>
+      </label>
+      <label>スケールKey
+        <select id="scaleRoot"></select>
+      </label>
+    </div>
+
+    <div class="row">
+      <label>コード強調
+        <select id="chordOn">
+          <option value="off">オフ</option>
+          <option value="on">オン</option>
+        </select>
+      </label>
+      <label>コードRoot
+        <select id="chordRoot"></select>
+      </label>
+      <label>Quality
+        <select id="chordQuality"></select>
+      </label>
+    </div>
+  </div>
+
+  <!-- マーク＆共有 -->
+  <div class="panel" id="panel-markshare" role="tabpanel" aria-labelledby="tab-markshare">
+    <div class="row">
+      <label>描画モード
+        <select id="drawMode">
+          <option value="on">オン</option>
+          <option value="off">オフ</option>
+        </select>
+      </label>
+
+      <label>形
+        <div class="pillGroup" aria-label="形">
+          <button class="pill" id="shapeCircle" aria-pressed="true" type="button">◯</button>
+          <button class="pill" id="shapeSquare" aria-pressed="false" type="button">□</button>
+        </div>
+      </label>
+
+      <label>色
+        <div class="pillGroup" aria-label="色">
+          <button class="pill" id="colorRed" aria-pressed="true" type="button"><span class="colorDot" style="background:var(--mk-red)"></span>赤</button>
+          <button class="pill" id="colorGreen" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-green)"></span>緑</button>
+          <button class="pill" id="colorYellow" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-yellow)"></span>黄</button>
+        </div>
+      </label>
+
+      <label>　
+        <button class="btn" id="clearMarksBtn" type="button">マーク全消去</button>
+      </label>
+
+      <label>状態共有リンク
+        <button class="btn" id="copyLinkBtn" type="button">リンクをコピー</button>
+      </label>
+    </div>
+  </div>
+
+  <!-- always visible bottom-right -->
+  <div class="exportBtnWrap">
+    <button class="btn btnPrimary" id="makePngBtn" type="button">PNG生成</button>
+  </div>
+</div>
+
+<div class="boardWrap">
+  <div id="board"></div>
+</div>
+
+<!-- PNG Modal -->
+<div class="modalBack" id="pngModalBack" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="PNG書き出し">
+    <div class="modalHead">
+      <div class="modalTitle">PNGプレビュー</div>
+      <button class="btn" id="closeModalBtn" type="button">閉じる</button>
+    </div>
+    <div class="modalBody">
+      <img id="pngPreview" class="previewImg" alt="PNGプレビュー（長押しで保存できます）" />
+      <div class="modalActions">
+        <button class="btn" id="savePngBtn" type="button" disabled>保存</button>
+        <button class="btn" id="sharePngBtn" type="button" disabled>共有</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   Notes / Display
+========================= */
+const NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const SHARP_TO_FLAT = { "C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb" };
+
+const NOTE_CHOICES = [
+  { label:"C", sharp:"C" },
+  { label:"C♯/D♭", sharp:"C#" },
+  { label:"D", sharp:"D" },
+  { label:"D♯/E♭", sharp:"D#" },
+  { label:"E", sharp:"E" },
+  { label:"F", sharp:"F" },
+  { label:"F♯/G♭", sharp:"F#" },
+  { label:"G", sharp:"G" },
+  { label:"G♯/A♭", sharp:"G#" },
+  { label:"A", sharp:"A" },
+  { label:"A♯/B♭", sharp:"A#" },
+  { label:"B", sharp:"B" },
+];
+
+const idx = (n) => NOTES.indexOf(n);
+
+function toDisplay(noteSharp, mode){
+  if (mode === "sharp") return noteSharp.replace("#","♯");
+  const flatRaw = SHARP_TO_FLAT[noteSharp] ?? noteSharp;
+  const flat = flatRaw.replace("b","♭");
+  if (mode === "flat") return flat;
+  if (SHARP_TO_FLAT[noteSharp]) return `${noteSharp.replace("#","♯")}/${flat}`;
+  return noteSharp;
+}
+
+/* =========================
+   Scale / Chord
+========================= */
+const MAJOR = [0,2,4,5,7,9,11];
+const MINOR = [0,2,3,5,7,8,10];
+
+function buildScaleSet(rootSharp, type){
+  if (type === "off") return null;
+  const base = idx(rootSharp);
+  const steps = (type === "major") ? MAJOR : MINOR;
+  return new Set(steps.map(s => (base + s) % 12));
+}
+
+const CHORD_QUALITIES = [
+  { id:"M",    label:"M（1 3 5）",             semis:[0,4,7] },
+  { id:"m",    label:"m（1 ♭3 5）",            semis:[0,3,7] },
+  { id:"sus2", label:"sus2（1 2 5）",          semis:[0,2,7] },
+  { id:"sus4", label:"sus4（1 4 5）",          semis:[0,5,7] },
+  { id:"dim",  label:"dim（1 ♭3 ♭5）",         semis:[0,3,6] },
+  { id:"aug",  label:"aug（1 3 ♯5）",          semis:[0,4,8] },
+  { id:"7",    label:"7（1 3 5 ♭7）",          semis:[0,4,7,10] },
+  { id:"M7",   label:"M7（1 3 5 7）",          semis:[0,4,7,11] },
+  { id:"m7",   label:"m7（1 ♭3 5 ♭7）",        semis:[0,3,7,10] },
+  { id:"mM7",  label:"mM7（1 ♭3 5 7）",        semis:[0,3,7,11] },
+  { id:"m7b5", label:"m7♭5（1 ♭3 ♭5 ♭7）",     semis:[0,3,6,10] },
+  { id:"dim7", label:"dim7（1 ♭3 ♭5 𝄫7）",     semis:[0,3,6,9] },
+];
+
+function buildChordSet(rootSharp, qualityId){
+  const q = CHORD_QUALITIES.find(x => x.id === qualityId) ?? CHORD_QUALITIES[0];
+  const base = idx(rootSharp);
+  return new Set(q.semis.map(s => (base + s) % 12));
+}
+
+/* =========================
+   UI
+========================= */
+const els = {
+  tuningSelectors: document.getElementById("tuningSelectors"),
+  maxFret: document.getElementById("maxFret"),
+  viewStart: document.getElementById("viewStart"),
+  viewEnd: document.getElementById("viewEnd"),
+  showNoteNames: document.getElementById("showNoteNames"),
+  accMode: document.getElementById("accMode"),
+
+  scaleType: document.getElementById("scaleType"),
+  scaleRoot: document.getElementById("scaleRoot"),
+
+  chordOn: document.getElementById("chordOn"),
+  chordRoot: document.getElementById("chordRoot"),
+  chordQuality: document.getElementById("chordQuality"),
+
+  drawMode: document.getElementById("drawMode"),
+  shapeCircle: document.getElementById("shapeCircle"),
+  shapeSquare: document.getElementById("shapeSquare"),
+  colorRed: document.getElementById("colorRed"),
+  colorGreen: document.getElementById("colorGreen"),
+  colorYellow: document.getElementById("colorYellow"),
+  clearMarksBtn: document.getElementById("clearMarksBtn"),
+  copyLinkBtn: document.getElementById("copyLinkBtn"),
+
+  makePngBtn: document.getElementById("makePngBtn"),
+
+  modalBack: document.getElementById("pngModalBack"),
+  closeModalBtn: document.getElementById("closeModalBtn"),
+  pngPreview: document.getElementById("pngPreview"),
+  savePngBtn: document.getElementById("savePngBtn"),
+  sharePngBtn: document.getElementById("sharePngBtn"),
+
+  board: document.getElementById("board"),
+};
+
+const tabs = [
+  { btn: document.getElementById("tab-basic"), panel: document.getElementById("panel-basic") },
+  { btn: document.getElementById("tab-highlight"), panel: document.getElementById("panel-highlight") },
+  { btn: document.getElementById("tab-markshare"), panel: document.getElementById("panel-markshare") },
+];
+
+for (const t of tabs){
+  t.btn.addEventListener("click", () => {
+    for (const u of tabs){
+      u.btn.setAttribute("aria-selected", u===t ? "true" : "false");
+      u.panel.classList.toggle("active", u===t);
+    }
+  });
+}
+
+// Tuning selects (input order: 6->1)
+const tuningLabels = ["6弦","5弦","4弦","3弦","2弦","1弦"];
+const tuningDefault = ["E","A","D","G","B","E"];
+const tuningSelectEls = [];
+
+function addSelectOptions(sel){
+  for (const c of NOTE_CHOICES){
+    const opt = document.createElement("option");
+    opt.value = c.sharp;
+    opt.textContent = c.label;
+    sel.appendChild(opt);
+  }
+}
+for (let i=0; i<6; i++){
+  const label = document.createElement("label");
+  label.textContent = tuningLabels[i];
+  const sel = document.createElement("select");
+  addSelectOptions(sel);
+  sel.value = tuningDefault[i];
+  label.appendChild(sel);
+  els.tuningSelectors.appendChild(label);
+  tuningSelectEls.push(sel);
+}
+
+// Roots
+for (const sel of [els.scaleRoot, els.chordRoot]){
+  for (const c of NOTE_CHOICES){
+    const opt = document.createElement("option");
+    opt.value = c.sharp;
+    opt.textContent = c.label;
+    sel.appendChild(opt);
+  }
+}
+els.scaleRoot.value = "C";
+els.chordRoot.value = "C";
+
+// Quality
+for (const q of CHORD_QUALITIES){
+  const opt = document.createElement("option");
+  opt.value = q.id;
+  opt.textContent = q.label;
+  els.chordQuality.appendChild(opt);
+}
+els.chordQuality.value = "M";
+
+/* =========================
+   Draw tool state
+   defaults: red + circle, drawMode ON
+========================= */
+els.drawMode.value = "on";
+let pen = { shape: "circle", color: "red" };
+
+function setShape(shape){
+  pen.shape = shape;
+  els.shapeCircle.setAttribute("aria-pressed", shape==="circle" ? "true" : "false");
+  els.shapeSquare.setAttribute("aria-pressed", shape==="square" ? "true" : "false");
+}
+function setColor(color){
+  pen.color = color;
+  els.colorRed.setAttribute("aria-pressed", color==="red" ? "true" : "false");
+  els.colorGreen.setAttribute("aria-pressed", color==="green" ? "true" : "false");
+  els.colorYellow.setAttribute("aria-pressed", color==="yellow" ? "true" : "false");
+}
+setShape("circle");
+setColor("red");
+
+els.shapeCircle.addEventListener("click", () => setShape("circle"));
+els.shapeSquare.addEventListener("click", () => setShape("square"));
+els.colorRed.addEventListener("click", () => setColor("red"));
+els.colorGreen.addEventListener("click", () => setColor("green"));
+els.colorYellow.addEventListener("click", () => setColor("yellow"));
+
+/* =========================
+   Markers (position-based)
+   key: "s{0-5}-f{0..}"
+========================= */
+const markers = new Map();
+function markerKey(stringIndex, fret){ return `s${stringIndex}-f${fret}`; }
+function sameMarker(a,b){ return a && b && a.shape===b.shape && a.color===b.color; }
+
+/* =========================
+   Helpers: view range clamp
+========================= */
+function clampViewRange(){
+  let maxF = Number(els.maxFret.value);
+  if (!Number.isFinite(maxF)) maxF = 12;
+  maxF = Math.min(24, Math.max(0, maxF));
+  els.maxFret.value = String(maxF);
+
+  let s = Number(els.viewStart.value);
+  let e = Number(els.viewEnd.value);
+  if (!Number.isFinite(s)) s = 0;
+  if (!Number.isFinite(e)) e = maxF;
+
+  s = Math.min(maxF, Math.max(0, s));
+  e = Math.min(maxF, Math.max(0, e));
+  if (e < s) e = s;
+
+  els.viewStart.value = String(s);
+  els.viewEnd.value = String(e);
+
+  return { maxFret: maxF, viewStart: s, viewEnd: e };
+}
+
+/* =========================
+   SVG Drawing
+========================= */
+function svgEl(name, attrs = {}){
+  const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+  for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  return el;
+}
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function drawFretboard(){
+  const { maxFret, viewStart, viewEnd } = clampViewRange();
+  const mode = els.accMode.value;
+
+  const showNames = (els.showNoteNames.value === "on");
+
+  const scaleType = els.scaleType.value;
+  const scaleRoot = els.scaleRoot.value;
+  const scaleSet = buildScaleSet(scaleRoot, scaleType);
+
+  const chordEnabled = (els.chordOn.value === "on");
+  const chordRoot = els.chordRoot.value;
+  const chordQuality = els.chordQuality.value;
+  const chordSet = chordEnabled ? buildChordSet(chordRoot, chordQuality) : null;
+
+  // Display order: top 1st string -> bottom 6th string
+  const tuning = tuningSelectEls.map(s => s.value); // [6..1]
+  const strings = [
+    { open: tuning[5] }, // 1
+    { open: tuning[4] }, // 2
+    { open: tuning[3] }, // 3
+    { open: tuning[2] }, // 4
+    { open: tuning[1] }, // 5
+    { open: tuning[0] }, // 6
+  ];
+
+  // Layout
+  const topPad = 56;
+  const leftPad = 56;
+  const rightPad = 18;
+  const bottomPad = 22;
+
+  const cellW = 76;
+  const nutX = leftPad + 46;
+  const openX = nutX - cellW * 0.62;
+
+  const boardH = 360;
+  const yTop = topPad + 38;
+  const yBottom = boardH - bottomPad;
+  const stringGap = (yBottom - yTop) / 5;
+
+  // Columns: only viewStart..viewEnd
+  const visibleFrets = [];
+  for (let f=viewStart; f<=viewEnd; f++) visibleFrets.push(f);
+
+  const colCount = visibleFrets.length;
+  const width = nutX + (colCount * cellW) + rightPad;
+  const height = boardH;
+
+  const svg = svgEl("svg", {
+    viewBox: `0 0 ${width} ${height}`,
+    role: "img",
+    "aria-label": "ギター指板"
+  });
+
+  svg.appendChild(svgEl("rect", { x:0, y:0, width, height, fill:"#fff" }));
+
+  // Labels: open
+  {
+    const x0 = openX;
+    svg.appendChild(svgEl("text", {
+      x:x0, y:20, "text-anchor":"middle",
+      "font-size": 11, "font-weight": 700, fill: cssVar("--ui-muted"),
+      "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+    })).textContent = "開放弦";
+
+    svg.appendChild(svgEl("text", {
+      x:x0, y:42, "text-anchor":"middle",
+      "font-size": 14, "font-weight": 700, fill:"#111",
+      "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+    })).textContent = "0";
+  }
+
+  // Fret numbers (only visible)
+  const emph = new Set([3,5,7,9,12]);
+  for (let i=0; i<visibleFrets.length; i++){
+    const f = visibleFrets[i];
+    const x = nutX + (i + 0.5) * cellW;
+    const isEm = emph.has(f);
+    svg.appendChild(svgEl("text", {
+      x, y:42, "text-anchor":"middle",
+      "font-size": isEm ? 15 : 14,
+      "font-weight": isEm ? 700 : 600,
+      fill: isEm ? "#111" : cssVar("--ui-muted"),
+      "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+    })).textContent = String(f);
+  }
+
+  // Nut
+  svg.appendChild(svgEl("line", {
+    x1:nutX, y1:yTop-14, x2:nutX, y2:yBottom+14,
+    stroke: cssVar("--note-stroke-strong"), "stroke-width": 4, "stroke-linecap":"round"
+  }));
+
+  // Frets (only visible)
+  for (let i=0; i<visibleFrets.length; i++){
+    const f = visibleFrets[i];
+    const x = nutX + (i+1) * cellW;
+    svg.appendChild(svgEl("line", {
+      x1:x, y1:yTop-14, x2:x, y2:yBottom+14,
+      stroke:"#333",
+      "stroke-width": (f===12 ? 2.8 : 1.3),
+      "stroke-linecap":"round"
+    }));
+  }
+
+  // Position dots (only if within visible)
+  for (const f of [3,5,7,9,12]){
+    if (f < viewStart || f > viewEnd) continue;
+    const i = f - viewStart;
+    const x = nutX + (i + 0.5) * cellW;
+    if (f===12){
+      const y1 = yTop + stringGap * 1.6;
+      const y2 = yTop + stringGap * 3.4;
+      svg.appendChild(svgEl("circle", { cx:x, cy:y1, r:5.2, fill:"#d9d9d9" }));
+      svg.appendChild(svgEl("circle", { cx:x, cy:y2, r:5.2, fill:"#d9d9d9" }));
+    } else {
+      const cy = (yTop+yBottom)/2;
+      svg.appendChild(svgEl("circle", { cx:x, cy:cy, r:5.2, fill:"#d9d9d9" }));
+    }
+  }
+
+  // Strings
+  for (let s=0; s<6; s++){
+    const y = yTop + s * stringGap;
+    const stringNo = s + 1;
+    const thick = 3.1 - (stringNo-1)*0.33;
+    svg.appendChild(svgEl("line", {
+      x1: openX-18, y1:y, x2: nutX + colCount*cellW + 10, y2:y,
+      stroke:"#444", "stroke-width": Math.max(1.2, thick),
+      "stroke-linecap":"round", opacity:0.95
+    }));
+  }
+
+  // String numbers
+  for (let s=0; s<6; s++){
+    const y = yTop + s*stringGap + 6;
+    svg.appendChild(svgEl("text", {
+      x: 24, y, "text-anchor":"middle",
+      "font-size": 13, "font-weight": 700, fill: cssVar("--ui-muted"),
+      "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+    })).textContent = String(s+1);
+  }
+
+  // Styles for notes
+  const fillScale = cssVar("--fill-scale");
+  const fillChord = cssVar("--fill-chord");
+  const fillBoth  = cssVar("--fill-both");
+
+  const normalSW = 1.3;
+  const openSW = 3.0;
+  const fret12SW = 2.6;
+
+  // Marker stroke widths
+  const markerSW = openSW * 3;         // 9
+  const markerWhiteSW = markerSW + 2;  // 11
+
+  // Note/Marker size tuning (avoid overlap with thick stroke)
+  // Make marker outer size depend on stringGap to avoid touching up/down.
+  const noteR = 18;
+  const safeOuterR = Math.max(12, Math.min(18, (stringGap * 0.5) - (markerSW * 0.55))); // clamp
+  const markerR = Math.min(noteR, safeOuterR); // keep <= note circle
+  const markerDiameter = markerR * 2;
+
+  function getFill(noteIndex){
+    const inScale = scaleSet ? scaleSet.has(noteIndex) : false;
+    const inChord = chordSet ? chordSet.has(noteIndex) : false;
+    if (inScale && inChord) return fillBoth;
+    if (inChord) return fillChord;
+    if (inScale) return fillScale;
+    return "#fff";
+  }
+  function markerColor(color){
+    if (color==="green") return cssVar("--mk-green");
+    if (color==="yellow") return cssVar("--mk-yellow");
+    return cssVar("--mk-red");
+  }
+
+  const drawOn = () => (els.drawMode.value === "on");
+
+  // OPEN (fret 0) + visible frets
+  const fretsToRender = [0, ...visibleFrets];
+
+  for (let s=0; s<6; s++){
+    const y = yTop + s * stringGap;
+    const base = idx(strings[s].open);
+
+    for (const f of fretsToRender){
+      const noteIndex = (base + f) % 12;
+      const noteSharp = NOTES[noteIndex];
+
+      let x;
+      if (f === 0){
+        x = openX;
+      } else {
+        const i = f - viewStart; // 0..colCount-1
+        x = nutX + (i + 0.5) * cellW;
+      }
+
+      const fill = getFill(noteIndex);
+
+      let stroke = cssVar("--note-stroke");
+      let sw = normalSW;
+
+      if (f === 0){
+        stroke = cssVar("--note-stroke-strong");
+        sw = openSW;
+      } else if (f === 12){
+        stroke = cssVar("--note-stroke-strong");
+        sw = fret12SW;
+      }
+
+      svg.appendChild(svgEl("circle", {
+        cx:x, cy:y, r:noteR,
+        fill,
+        stroke,
+        "stroke-width": sw
+      }));
+
+      if (showNames){
+        const text = svgEl("text", {
+          x, y: y + 5.8,
+          "text-anchor":"middle",
+          "font-size": 13.5,
+          "font-weight": 600,
+          fill:"#111",
+          "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+        });
+        text.textContent = toDisplay(noteSharp, mode);
+        svg.appendChild(text);
+      }
+
+      // Marker overlay (circle diameter == square side)
+      const mk = markers.get(markerKey(s,f));
+      if (mk){
+        const mkStroke = markerColor(mk.color);
+
+        if (mk.shape === "circle"){
+          svg.appendChild(svgEl("circle", {
+            cx:x, cy:y, r: markerR,
+            fill:"none",
+            stroke:"#fff",
+            "stroke-width": markerWhiteSW,
+            "stroke-linecap":"round"
+          }));
+          svg.appendChild(svgEl("circle", {
+            cx:x, cy:y, r: markerR,
+            fill:"none",
+            stroke: mkStroke,
+            "stroke-width": markerSW,
+            "stroke-linecap":"round"
+          }));
+        } else {
+          const side = markerDiameter;      // ← 揃えた
+          const x0 = x - side/2;
+          const y0 = y - side/2;
+
+          svg.appendChild(svgEl("rect", {
+            x:x0, y:y0, width:side, height:side,
+            fill:"none",
+            stroke:"#fff",
+            "stroke-width": markerWhiteSW,
+            "stroke-linejoin":"round"
+          }));
+          svg.appendChild(svgEl("rect", {
+            x:x0, y:y0, width:side, height:side,
+            fill:"none",
+            stroke: mkStroke,
+            "stroke-width": markerSW,
+            "stroke-linejoin":"round"
+          }));
+        }
+      }
+
+      // Tap target
+      let hitX, hitW;
+      if (f === 0){
+        hitX = x - cellW/2;
+        hitW = cellW;
+      } else {
+        hitX = x - cellW/2;
+        hitW = cellW;
+      }
+      const hit = svgEl("rect", {
+        x: hitX,
+        y: y - stringGap/2,
+        width: hitW,
+        height: stringGap,
+        fill: "transparent",
+        cursor: drawOn() ? "pointer" : "default",
+        "data-s": String(s),
+        "data-f": String(f)
+      });
+
+      hit.addEventListener("click", () => {
+        if (!drawOn()) return;
+
+        const sIdx = Number(hit.getAttribute("data-s"));
+        const fret = Number(hit.getAttribute("data-f"));
+        const key = markerKey(sIdx, fret);
+
+        const next = { shape: pen.shape, color: pen.color };
+        const cur = markers.get(key);
+
+        if (sameMarker(cur, next)) markers.delete(key);
+        else markers.set(key, next);
+
+        drawFretboard();
+      });
+
+      svg.appendChild(hit);
+    }
+  }
+
+  els.board.innerHTML = "";
+  els.board.appendChild(svg);
+  window.__FRETBOARD_SVG__ = svg;
+}
+
+/* =========================
+   PNG Export (Modal)
+========================= */
+let lastPngBlob = null;
+let lastPngUrl = null;
+
+function openModal(){
+  els.modalBack.classList.add("show");
+  els.modalBack.setAttribute("aria-hidden", "false");
+}
+function closeModal(){
+  els.modalBack.classList.remove("show");
+  els.modalBack.setAttribute("aria-hidden", "true");
+}
+els.closeModalBtn.addEventListener("click", closeModal);
+els.modalBack.addEventListener("click", (e) => { if (e.target === els.modalBack) closeModal(); });
+
+function setPreviewFromBlob(blob){
+  if (lastPngUrl) URL.revokeObjectURL(lastPngUrl);
+  lastPngBlob = blob;
+  lastPngUrl = URL.createObjectURL(blob);
+  els.pngPreview.src = lastPngUrl;
+  els.savePngBtn.disabled = false;
+  els.sharePngBtn.disabled = false;
+}
+
+function serializeSvgWithSize(svg){
+  const serializer = new XMLSerializer();
+  const vb = svg.viewBox.baseVal;
+  const w = Math.ceil(vb.width);
+  const h = Math.ceil(vb.height);
+
+  const clone = svg.cloneNode(true);
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  clone.setAttribute("width", String(w));
+  clone.setAttribute("height", String(h));
+  clone.setAttribute("preserveAspectRatio", "xMinYMin meet");
+  if (!clone.getAttribute("viewBox")) clone.setAttribute("viewBox", `0 0 ${w} ${h}`);
+
+  return { svgText: serializer.serializeToString(clone), w, h };
+}
+
+function svgToPngBlob(svg, scale=2){
+  return new Promise((resolve, reject) => {
+    try{
+      const { svgText, w, h } = serializeSvgWithSize(svg);
+      const svgBlob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = w * scale;
+        canvas.height = h * scale;
+
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+
+        URL.revokeObjectURL(url);
+
+        canvas.toBlob((blob) => {
+          if (!blob) return reject(new Error("PNG生成に失敗しました"));
+          resolve(blob);
+        }, "image/png");
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("SVG読み込みに失敗しました"));
+      };
+      img.src = url;
+    } catch(err){
+      reject(err);
+    }
+  });
+}
+
+els.makePngBtn.addEventListener("click", async () => {
+  const svg = window.__FRETBOARD_SVG__;
+  if (!svg) return;
+
+  openModal();
+  els.pngPreview.removeAttribute("src");
+  els.savePngBtn.disabled = true;
+  els.sharePngBtn.disabled = true;
+
+  els.makePngBtn.disabled = true;
+  els.makePngBtn.textContent = "PNG生成中…";
+
+  try{
+    const blob = await svgToPngBlob(svg, 2);
+    setPreviewFromBlob(blob);
+  } catch(e){
+    alert(e?.message ?? String(e));
+    closeModal();
+  } finally{
+    els.makePngBtn.disabled = false;
+    els.makePngBtn.textContent = "PNG生成";
+  }
+});
+
+els.savePngBtn.addEventListener("click", () => {
+  if (!lastPngBlob) return;
+  const a = document.createElement("a");
+  a.href = lastPngUrl;
+  a.download = "fretboard.png";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
+els.sharePngBtn.addEventListener("click", async () => {
+  if (!lastPngBlob) return;
+  const file = new File([lastPngBlob], "fretboard.png", { type: "image/png" });
+
+  try{
+    if (navigator.canShare && navigator.canShare({ files: [file] })){
+      await navigator.share({ files: [file], title: "指板", text: "" });
+      return;
+    }
+  } catch(_) {}
+
+  window.open(lastPngUrl, "_blank");
+});
+
+els.clearMarksBtn.addEventListener("click", () => {
+  markers.clear();
+  drawFretboard();
+});
+
+/* =========================
+   State share link (URL)
+========================= */
+function b64encode(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function b64decode(str){
+  return decodeURIComponent(escape(atob(str)));
+}
+
+function getState(){
+  const { maxFret, viewStart, viewEnd } = clampViewRange();
+  const tuning = tuningSelectEls.map(s => s.value); // 6->1
+  const marks = Array.from(markers.entries()); // [ [key, {shape,color}], ... ]
+  return {
+    v: 1,
+    tuning,
+    maxFret,
+    viewStart,
+    viewEnd,
+    showNoteNames: els.showNoteNames.value,
+    accMode: els.accMode.value,
+    scaleType: els.scaleType.value,
+    scaleRoot: els.scaleRoot.value,
+    chordOn: els.chordOn.value,
+    chordRoot: els.chordRoot.value,
+    chordQuality: els.chordQuality.value,
+    drawMode: els.drawMode.value,
+    pen,
+    marks
+  };
+}
+
+function applyState(st){
+  try{
+    if (!st || typeof st !== "object") return;
+
+    if (Array.isArray(st.tuning) && st.tuning.length === 6){
+      // tuning is 6->1
+      for (let i=0; i<6; i++){
+        if (NOTES.includes(st.tuning[i])) tuningSelectEls[i].value = st.tuning[i];
+      }
+    }
+    if (Number.isFinite(st.maxFret)) els.maxFret.value = String(st.maxFret);
+    if (Number.isFinite(st.viewStart)) els.viewStart.value = String(st.viewStart);
+    if (Number.isFinite(st.viewEnd)) els.viewEnd.value = String(st.viewEnd);
+
+    if (st.showNoteNames) els.showNoteNames.value = st.showNoteNames;
+    if (st.accMode) els.accMode.value = st.accMode;
+
+    if (st.scaleType) els.scaleType.value = st.scaleType;
+    if (st.scaleRoot) els.scaleRoot.value = st.scaleRoot;
+
+    if (st.chordOn) els.chordOn.value = st.chordOn;
+    if (st.chordRoot) els.chordRoot.value = st.chordRoot;
+    if (st.chordQuality) els.chordQuality.value = st.chordQuality;
+
+    if (st.drawMode) els.drawMode.value = st.drawMode;
+
+    if (st.pen && st.pen.shape && st.pen.color){
+      setShape(st.pen.shape);
+      setColor(st.pen.color);
+    }
+
+    markers.clear();
+    if (Array.isArray(st.marks)){
+      for (const [k, v] of st.marks){
+        if (!k || !v) continue;
+        if ((v.shape==="circle"||v.shape==="square") && (v.color==="red"||v.color==="green"||v.color==="yellow")){
+          markers.set(k, v);
+        }
+      }
+    }
+  } catch(_) {}
+}
+
+function buildShareUrl(){
+  const st = getState();
+  const json = JSON.stringify(st);
+  const enc = b64encode(json);
+  const url = new URL(location.href);
+  url.searchParams.set("s", enc);
+  return url.toString();
+}
+
+els.copyLinkBtn.addEventListener("click", async () => {
+  const url = buildShareUrl();
+  try{
+    await navigator.clipboard.writeText(url);
+    els.copyLinkBtn.textContent = "コピーしました";
+    setTimeout(() => (els.copyLinkBtn.textContent = "リンクをコピー"), 1200);
+  } catch(_) {
+    prompt("このURLをコピーして共有してね", url);
+  }
+});
+
+// Load from URL if exists
+(function initFromUrl(){
+  const sp = new URLSearchParams(location.search);
+  const s = sp.get("s");
+  if (!s) return;
+  try{
+    const json = b64decode(s);
+    const st = JSON.parse(json);
+    applyState(st);
+  } catch(_) {}
+})();
+
+/* =========================
+   Redraw triggers
+========================= */
+[
+  els.maxFret, els.viewStart, els.viewEnd,
+  els.accMode, els.showNoteNames,
+  els.scaleType, els.scaleRoot,
+  els.chordOn, els.chordRoot, els.chordQuality,
+  els.drawMode
+].forEach(el => el.addEventListener("change", drawFretboard));
+
+tuningSelectEls.forEach(sel => sel.addEventListener("change", drawFretboard));
+
+/* =========================
+   First draw
+========================= */
+drawFretboard();
+</script>
+</body>
+</html>
