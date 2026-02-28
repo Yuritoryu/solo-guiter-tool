@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Yuritoの考えた最強のソロギターツール</title>
+<title>Yuritoの考えた最強のソロギターツール(仮)</title>
 
 <style>
   :root{
@@ -86,10 +86,10 @@
     display:grid;
     gap:6px;
     font-size:14px;
-    min-width:140px;
+    min-width:120px;
   }
   .rangeField{
-    min-width: 320px;
+    min-width: 280px;
   }
   .rangeInputs{
     display:flex;
@@ -103,6 +103,45 @@
     font-size:18px;
     color:var(--ui-muted);
     line-height:1;
+  }
+  #tuningSelectors{
+    gap:10px;
+  }
+  #tuningSelectors label{
+    min-width:92px;
+  }
+  #tuningSelectors select{
+    width:92px;
+    font-size:15px;
+    padding:8px 8px;
+  }
+  /* Control-specific sizing */
+  #viewStart, #viewEnd{
+    width:40px;
+  }
+  #showNoteNames, #chordOn, #drawMode{
+    width:118px;
+  }
+  #scaleType{
+    width:200px;
+  }
+  #scaleRoot, #chordRoot{
+    width:98px;
+  }
+  #accMode{
+    width:178px;
+  }
+  #chordQuality{
+    width:186px;
+  }
+  #clearMarksBtn{
+    min-width:132px;
+  }
+  #copyLinkBtn{
+    min-width:138px;
+  }
+  #makePngBtn{
+    min-width:116px;
   }
 
   select, input, button{
@@ -241,12 +280,25 @@
 
   @media (max-width:860px){
     label{ min-width: 46%; }
+    .rangeField{ min-width: 100%; }
+    .rangeInputs input{ width:92px; }
+    #tuningSelectors label{ min-width:84px; }
+    #tuningSelectors select{ width:84px; }
+    #showNoteNames, #scaleType, #chordOn, #drawMode,
+    #scaleRoot, #chordRoot, #accMode, #chordQuality{
+      width:100%;
+      min-width:0;
+    }
+    #clearMarksBtn, #copyLinkBtn{
+      min-width:0;
+      width:100%;
+    }
   }
 </style>
 </head>
 
 <body>
-<h1>Yuritoの考えた最強のソロギターツール</h1>
+<h1>Yuritoの考えた最強のソロギターツール(仮)</h1>
 
 <div class="card">
   <div class="tabs" role="tablist" aria-label="設定タブ">
@@ -354,7 +406,7 @@
 
   <!-- always visible bottom-right -->
   <div class="exportBtnWrap">
-    <button class="btn btnPrimary" id="makePngBtn" type="button">PNG出力</button>
+    <button class="btn btnPrimary" id="makePngBtn" type="button">画像出力</button>
   </div>
 </div>
 
@@ -365,13 +417,13 @@
 
 <!-- PNG Modal -->
 <div class="modalBack" id="pngModalBack" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="PNG書き出し">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="画像書き出し">
     <div class="modalHead">
-      <div class="modalTitle">PNGプレビュー</div>
+      <div class="modalTitle">画像プレビュー</div>
       <button class="btn" id="closeModalBtn" type="button">閉じる</button>
     </div>
     <div class="modalBody">
-      <img id="pngPreview" class="previewImg" alt="PNGプレビュー（読み込み中）" />
+      <img id="pngPreview" class="previewImg" alt="画像プレビュー（読み込み中）" />
       <div class="modalActions">
         <button class="btn" id="savePngBtn" type="button" disabled>保存</button>
         <button class="btn" id="sharePngBtn" type="button" disabled>共有</button>
@@ -1065,7 +1117,7 @@ function svgToPngBlob(svg, scale=2){
         URL.revokeObjectURL(url);
 
         canvas.toBlob((blob) => {
-          if (!blob) return reject(new Error("PNG出力に失敗しました"));
+          if (!blob) return reject(new Error("画像出力に失敗しました"));
           resolve(blob);
         }, "image/png");
       };
@@ -1090,7 +1142,7 @@ els.makePngBtn.addEventListener("click", async () => {
   els.sharePngBtn.disabled = true;
 
   els.makePngBtn.disabled = true;
-  els.makePngBtn.textContent = "PNG出力中...";
+  els.makePngBtn.textContent = "画像出力中...";
 
   try{
     const blob = await svgToPngBlob(svg, 2);
@@ -1100,7 +1152,7 @@ els.makePngBtn.addEventListener("click", async () => {
     closeModal();
   } finally{
     els.makePngBtn.disabled = false;
-    els.makePngBtn.textContent = "PNG出力";
+    els.makePngBtn.textContent = "画像出力";
   }
 });
 
