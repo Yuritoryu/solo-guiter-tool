@@ -44,35 +44,72 @@
     position:relative;
   }
 
-  /* Tabs */
-  .tabs{
-    display:flex;
-    gap:8px;
-    align-items:center;
-    flex-wrap:wrap;
-    margin-bottom:10px;
-  }
-  .tabBtn{
-    border:1px solid var(--ui-border);
+  /* Stacked windows */
+  .panelWindow{
+    border:1px solid #e6e8ee;
+    border-radius:14px;
     background:#fff;
-    border-radius:999px;
-    padding:8px 12px;
-    font-size:14px;
-    cursor:pointer;
-    user-select:none;
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
+    margin-bottom:10px;
+    overflow:hidden;
   }
-  .tabBtn[aria-selected="true"]{
-    border-color:#9bbfe6;
-    box-shadow:0 0 0 3px rgba(155,191,230,.25);
+  .panelHead{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 12px;
+    border-bottom:1px solid #eef0f5;
+    background:linear-gradient(180deg,#fcfdff 0%,#f8f9fc 100%);
+    cursor:pointer;
+  }
+  .panelTitle{
+    font-size:14px;
+    font-weight:800;
+    color:#1a1a1a;
+  }
+  .panelToggle{
+    border:1px solid #d4d9e3;
+    border-radius:999px;
+    width:30px;
+    height:30px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    font-size:16px;
+    line-height:1;
     font-weight:700;
+    color:#324057;
+    background:#fff;
+    cursor:pointer;
+    transition:all .18s ease;
+  }
+  .panelToggle:hover{
+    border-color:#9bbfe6;
+    box-shadow:0 0 0 3px rgba(155,191,230,.2);
+  }
+  .panel{
+    padding:10px 12px 12px;
+    overflow:hidden;
+    max-height: 720px;
+    opacity:1;
+    transition:max-height .26s ease, opacity .2s ease, padding .26s ease;
+    will-change:max-height, opacity, padding;
+  }
+  .panel.is-hidden{
+    max-height:0;
+    opacity:0;
+    padding-top:0;
+    padding-bottom:0;
+    pointer-events:none;
   }
 
-  .panel{
-    display:none;
-    border-top:1px solid #eee;
-    padding-top:10px;
+  @media (prefers-reduced-motion: reduce){
+    .panel{
+      transition:none;
+    }
   }
-  .panel.active{ display:block; }
 
   .row{
     display:flex;
@@ -108,12 +145,16 @@
     gap:10px;
   }
   #tuningSelectors label{
-    min-width:92px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    min-width:80px;
   }
   #tuningSelectors select{
-    width:92px;
-    font-size:15px;
-    padding:8px 8px;
+    width:auto;
+    font-size:16px;
+    padding:8px 10px;
   }
   /* Control-specific sizing */
   #viewStart, #viewEnd{
@@ -301,111 +342,122 @@
 <h1>Yuritoの考えた最強のソロギターツール(仮)</h1>
 
 <div class="card">
-  <div class="tabs" role="tablist" aria-label="設定タブ">
-    <button class="tabBtn" role="tab" id="tab-basic" aria-selected="true" aria-controls="panel-basic">基本</button>
-    <button class="tabBtn" role="tab" id="tab-highlight" aria-selected="false" aria-controls="panel-highlight">ハイライト</button>
-    <button class="tabBtn" role="tab" id="tab-markshare" aria-selected="false" aria-controls="panel-markshare">マーク・共有</button>
-  </div>
-
   <!-- 基本 -->
-  <div class="panel active" id="panel-basic" role="tabpanel" aria-labelledby="tab-basic">
-    <div class="row" id="tuningSelectors"></div>
-
-    <div class="row">
-      <label class="rangeField">フレット表示範囲
-        <div class="rangeInputs">
-          <input id="viewStart" aria-label="フレット表示範囲 始点" type="number" min="1" max="36" step="1" value="1" />
-          <span class="rangeSep" aria-hidden="true">～</span>
-          <input id="viewEnd" aria-label="フレット表示範囲 終点" type="number" min="1" max="36" step="1" value="12" />
-        </div>
-      </label>
-
-      <label>音名表示
-        <select id="showNoteNames">
-          <option value="abc">ABC</option>
-          <option value="solfege">ドレミ</option>
-          <option value="off">オフ</option>
-        </select>
-      </label>
-
-      <label>調合モード
-        <select id="accMode">
-          <option value="sharp">#で統一 (C#)</option>
-          <option value="flat">bで統一 (Db)</option>
-          <option value="both">両方 (C#/Db)</option>
-        </select>
-      </label>
+  <section class="panelWindow">
+    <div class="panelHead" tabindex="0">
+      <div class="panelTitle">基本</div>
+      <button class="panelToggle" id="toggle-basic" type="button" aria-label="基本の表示切替" aria-expanded="true" aria-controls="panel-basic">－</button>
     </div>
-  </div>
+    <div class="panel" id="panel-basic">
+      <div style="font-size:14px;font-weight:700;color:#333;margin:2px 0 6px;">チューニング</div>
+      <div class="row" id="tuningSelectors"></div>
+
+      <div class="row">
+        <label class="rangeField">フレット表示範囲
+          <div class="rangeInputs">
+            <input id="viewStart" aria-label="フレット表示範囲 始点" type="number" min="1" max="36" step="1" value="1" />
+            <span class="rangeSep" aria-hidden="true">～</span>
+            <input id="viewEnd" aria-label="フレット表示範囲 終点" type="number" min="1" max="36" step="1" value="12" />
+          </div>
+        </label>
+
+        <label>音名表記
+          <select id="showNoteNames">
+            <option value="abc">ABC</option>
+            <option value="solfege">ドレミ</option>
+            <option value="off">オフ</option>
+          </select>
+        </label>
+
+        <label>調号表記
+          <select id="accMode">
+            <option value="sharp">#で統一 (C#)</option>
+            <option value="flat">bで統一 (Db)</option>
+            <option value="both">両方 (C#/Db)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </section>
 
   <!-- ハイライト -->
-  <div class="panel" id="panel-highlight" role="tabpanel" aria-labelledby="tab-highlight">
-    <div class="row">
-      <label>スケール
-        <select id="scaleType">
-          <option value="off">オフ</option>
-          <option value="major">メジャー</option>
-          <option value="minor">ナチュラルマイナー</option>
-        </select>
-      </label>
-      <label>スケール Key
-        <select id="scaleRoot"></select>
-      </label>
+  <section class="panelWindow">
+    <div class="panelHead" tabindex="0">
+      <div class="panelTitle">スケール＆コード</div>
+      <button class="panelToggle" id="toggle-highlight" type="button" aria-label="ハイライトの表示切替" aria-expanded="false" aria-controls="panel-highlight">▾</button>
     </div>
+    <div class="panel is-hidden" id="panel-highlight">
+      <div class="row">
+        <label>スケール表示
+          <select id="scaleType">
+            <option value="off">オフ</option>
+            <option value="major">メジャー</option>
+            <option value="minor">ナチュラルマイナー</option>
+          </select>
+        </label>
+        <label>スケール Key
+          <select id="scaleRoot"></select>
+        </label>
+      </div>
 
-    <div class="row">
-      <label>コード表示
-        <select id="chordOn">
-          <option value="off">オフ</option>
-          <option value="on">オン</option>
-        </select>
-      </label>
-      <label>コード Root
-        <select id="chordRoot"></select>
-      </label>
-      <label>コードタイプ
-        <select id="chordQuality"></select>
-      </label>
+      <div class="row">
+        <label>コード表示
+          <select id="chordOn">
+            <option value="off">オフ</option>
+            <option value="on">オン</option>
+          </select>
+        </label>
+        <label>コード Root
+          <select id="chordRoot"></select>
+        </label>
+        <label>コードタイプ
+          <select id="chordQuality"></select>
+        </label>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- マーク・共有 -->
-  <div class="panel" id="panel-markshare" role="tabpanel" aria-labelledby="tab-markshare">
-    <div class="row">
-      <label>描画モード
-        <select id="drawMode">
-          <option value="on">オン</option>
-          <option value="off">オフ</option>
-        </select>
-      </label>
-
-      <label>形
-        <div class="pillGroup" aria-label="形">
-          <button class="pill" id="shapeCircle" aria-pressed="true" type="button">丸</button>
-          <button class="pill" id="shapeSquare" aria-pressed="false" type="button">四角</button>
-        </div>
-      </label>
-
-      <label>色
-        <div class="pillGroup" aria-label="色">
-          <button class="pill" id="colorRed" aria-pressed="true" type="button"><span class="colorDot" style="background:var(--mk-red)"></span>赤</button>
-          <button class="pill" id="colorGreen" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-green)"></span>緑</button>
-          <button class="pill" id="colorYellow" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-yellow)"></span>黄</button>
-        </div>
-      </label>
-
-      <label>操作
-        <button class="btn" id="clearMarksBtn" type="button">マーク全削除</button>
-      </label>
-
-      <label>状態共有リンク
-        <button class="btn" id="copyLinkBtn" type="button">リンクをコピー</button>
-      </label>
+  <!-- カラーマーカー -->
+  <section class="panelWindow">
+    <div class="panelHead" tabindex="0">
+      <div class="panelTitle">カラーマーカー</div>
+      <button class="panelToggle" id="toggle-markshare" type="button" aria-label="カラーマーカーの表示切替" aria-expanded="false" aria-controls="panel-markshare">▾</button>
     </div>
-  </div>
+    <div class="panel is-hidden" id="panel-markshare">
+      <div class="row">
+        <label>描画モード
+          <select id="drawMode">
+            <option value="on">オン</option>
+            <option value="off">オフ</option>
+          </select>
+        </label>
+
+        <label>形
+          <div class="pillGroup" aria-label="形">
+            <button class="pill" id="shapeCircle" aria-pressed="true" type="button">◯</button>
+            <button class="pill" id="shapeSquare" aria-pressed="false" type="button">▢</button>
+          </div>
+        </label>
+
+        <label>色
+          <div class="pillGroup" aria-label="色">
+            <button class="pill" id="colorRed" aria-pressed="true" type="button"><span class="colorDot" style="background:var(--mk-red)"></span>赤</button>
+            <button class="pill" id="colorGreen" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-green)"></span>緑</button>
+            <button class="pill" id="colorYellow" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-yellow)"></span>黄</button>
+          </div>
+        </label>
+
+        <label>操作
+          <button class="btn" id="clearMarksBtn" type="button">マーク全削除</button>
+        </label>
+
+      </div>
+    </div>
+  </section>
 
   <!-- always visible bottom-right -->
   <div class="exportBtnWrap">
+    <button class="btn" id="copyLinkBtn" type="button">共有リンクをコピー</button>
     <button class="btn btnPrimary" id="makePngBtn" type="button">画像出力</button>
   </div>
 </div>
@@ -491,6 +543,19 @@ function toDisplay(noteSharp, accMode, labelMode){
   return toDisplayAbc(noteSharp, accMode);
 }
 
+function calcNoteFontSize(displayText, labelMode){
+  if (displayText.includes("/")){
+    // Slash notation is the widest (e.g. C#/Db, ド#/レb)
+    return labelMode === "solfege" ? 8.0 : 11.5;
+  }
+  if (labelMode === "solfege"){
+    // Solfege labels can be wider (e.g. ファ#)
+    if (displayText.length >= 3) return 11.2;
+    if (displayText.length === 2) return 12.2;
+  }
+  return 13.5;
+}
+
 function normalizeShowNoteNames(value){
   if (value === "on") return "abc";
   if (value === "off") return "off";
@@ -567,21 +632,44 @@ const els = {
   sharePngBtn: document.getElementById("sharePngBtn"),
 
   board: document.getElementById("board"),
+  toggleBasic: document.getElementById("toggle-basic"),
+  toggleHighlight: document.getElementById("toggle-highlight"),
+  toggleMarkshare: document.getElementById("toggle-markshare"),
 };
 
-const tabs = [
-  { btn: document.getElementById("tab-basic"), panel: document.getElementById("panel-basic") },
-  { btn: document.getElementById("tab-highlight"), panel: document.getElementById("panel-highlight") },
-  { btn: document.getElementById("tab-markshare"), panel: document.getElementById("panel-markshare") },
+const panelToggles = [
+  { btn: els.toggleBasic, panel: document.getElementById("panel-basic"), head: els.toggleBasic.closest(".panelHead") },
+  { btn: els.toggleHighlight, panel: document.getElementById("panel-highlight"), head: els.toggleHighlight.closest(".panelHead") },
+  { btn: els.toggleMarkshare, panel: document.getElementById("panel-markshare"), head: els.toggleMarkshare.closest(".panelHead") },
 ];
 
-for (const t of tabs){
-  t.btn.addEventListener("click", () => {
-    for (const u of tabs){
-      u.btn.setAttribute("aria-selected", u===t ? "true" : "false");
-      u.panel.classList.toggle("active", u===t);
+function setPanelVisible(btn, panel, visible){
+  panel.classList.toggle("is-hidden", !visible);
+  btn.setAttribute("aria-expanded", visible ? "true" : "false");
+  // Open: minus mark, Closed: down chevron
+  btn.textContent = visible ? "－" : "▾";
+}
+
+function togglePanel(t){
+  const visible = t.btn.getAttribute("aria-expanded") === "true";
+  setPanelVisible(t.btn, t.panel, !visible);
+  drawFretboard();
+}
+
+for (const t of panelToggles){
+  t.btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    togglePanel(t);
+  });
+  t.head.addEventListener("click", () => togglePanel(t));
+  t.head.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      togglePanel(t);
     }
   });
+  // Keep icons in sync with initial open/closed state.
+  setPanelVisible(t.btn, t.panel, !t.panel.classList.contains("is-hidden"));
 }
 
 // Tuning selects (input order: 6->1)
@@ -715,6 +803,10 @@ function fitBoardSvgSize(svg, intrinsicWidth){
 }
 
 function drawFretboard(){
+  const boardWrapEl = els.board.parentElement;
+  const prevScrollLeft = boardWrapEl ? boardWrapEl.scrollLeft : 0;
+  const prevScrollTop = boardWrapEl ? boardWrapEl.scrollTop : 0;
+
   const { viewStart, viewEnd } = clampViewRange();
   const mode = els.accMode.value;
 
@@ -897,7 +989,11 @@ function drawFretboard(){
     return cssVar("--mk-red");
   }
 
-  const drawOn = () => (els.drawMode.value === "on");
+  const drawOn = () => (
+    els.drawMode.value === "on" &&
+    !document.getElementById("panel-markshare").classList.contains("is-hidden")
+  );
+  const showMarkers = (els.drawMode.value === "on");
 
   // OPEN (fret 0) + visible frets
   const fretsToRender = [0, ...visibleFrets];
@@ -940,7 +1036,7 @@ function drawFretboard(){
 
       if (labelMode !== "off"){
         const displayText = toDisplay(noteSharp, mode, labelMode);
-        const noteFontSize = displayText.includes("/") ? 11.5 : 13.5;
+        const noteFontSize = calcNoteFontSize(displayText, labelMode);
         const noteTextY = y + (noteFontSize * 0.43);
         const text = svgEl("text", {
           x, y: noteTextY,
@@ -956,7 +1052,7 @@ function drawFretboard(){
 
       // Marker overlay (circle diameter == square side)
       const mk = markers.get(markerKey(s,f));
-      if (mk){
+      if (showMarkers && mk){
         const mkStroke = markerColor(mk.color);
 
         if (mk.shape === "circle"){
@@ -1052,6 +1148,12 @@ function drawFretboard(){
   els.board.innerHTML = "";
   els.board.appendChild(svg);
   window.__FRETBOARD_SVG__ = svg;
+
+  // Keep horizontal/vertical scroll position stable across redraws.
+  if (boardWrapEl){
+    boardWrapEl.scrollLeft = prevScrollLeft;
+    boardWrapEl.scrollTop = prevScrollTop;
+  }
 }
 
 /* =========================
@@ -1273,7 +1375,7 @@ els.copyLinkBtn.addEventListener("click", async () => {
   try{
     await navigator.clipboard.writeText(url);
     els.copyLinkBtn.textContent = "コピーしました";
-    setTimeout(() => (els.copyLinkBtn.textContent = "リンクをコピー"), 1200);
+    setTimeout(() => (els.copyLinkBtn.textContent = "共有リンクをコピー"), 1200);
   } catch(_) {
     prompt("このURLをコピーして共有してください", url);
   }
