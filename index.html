@@ -14,9 +14,9 @@
     --note-stroke-strong:#111;
 
     /* highlight fills */
-    --fill-scale:#e6f2ff;   /* 豌ｴ濶ｲ・医♀豌励↓蜈･繧翫・縺ｾ縺ｾ・・*/
-    --fill-chord:#ffe6a3;   /* 鮟・牡 */
-    --fill-both:#dff0a6;    /* 鮟・ｷ托ｼ域ｷｷ濶ｲ・・*/
+    --fill-scale:#e6f2ff;   /* scale notes */
+    --fill-chord:#ffe6a3;   /* chord tones */
+    --fill-both:#dff0a6;    /* both scale + chord */
 
     /* marker colors */
     --mk-red:#e1524a;
@@ -38,7 +38,7 @@
     border:1px solid var(--ui-border);
     border-radius:14px;
     padding:12px;
-    padding-bottom:64px; /* 蜿ｳ荳句崋螳壹・繧ｿ繝ｳ縺ｮ蛻・*/
+    padding-bottom:64px; /* reserve space for fixed export button */
     max-width:1200px;
     background:#fff;
     position:relative;
@@ -87,6 +87,22 @@
     gap:6px;
     font-size:14px;
     min-width:140px;
+  }
+  .rangeField{
+    min-width: 320px;
+  }
+  .rangeInputs{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .rangeInputs input{
+    width:88px;
+  }
+  .rangeSep{
+    font-size:18px;
+    color:var(--ui-muted);
+    line-height:1;
   }
 
   select, input, button{
@@ -156,7 +172,20 @@
     background:#fff;
     overflow-x:auto;
   }
-  svg{ display:block; width:100%; height:auto; }
+  svg{
+    display:block;
+    width:auto;
+    height:auto;
+    max-width:none;
+  }
+  .siteFooter{
+    max-width:1200px;
+    margin-top:10px;
+    font-size:12px;
+    color:#777;
+    text-align:right;
+    letter-spacing:.02em;
+  }
 
   /* Modal */
   .modalBack{
@@ -220,134 +249,132 @@
 <h1>Yuritoの考えた最強のソロギターツール</h1>
 
 <div class="card">
-  <div class="tabs" role="tablist" aria-label="險ｭ螳壹ち繝・>
-    <button class="tabBtn" role="tab" id="tab-basic" aria-selected="true" aria-controls="panel-basic">蝓ｺ譛ｬ</button>
-    <button class="tabBtn" role="tab" id="tab-highlight" aria-selected="false" aria-controls="panel-highlight">蠑ｷ隱ｿ陦ｨ遉ｺ</button>
-    <button class="tabBtn" role="tab" id="tab-markshare" aria-selected="false" aria-controls="panel-markshare">繝槭・繧ｯ・・・譛・/button>
+  <div class="tabs" role="tablist" aria-label="設定タブ">
+    <button class="tabBtn" role="tab" id="tab-basic" aria-selected="true" aria-controls="panel-basic">基本</button>
+    <button class="tabBtn" role="tab" id="tab-highlight" aria-selected="false" aria-controls="panel-highlight">ハイライト</button>
+    <button class="tabBtn" role="tab" id="tab-markshare" aria-selected="false" aria-controls="panel-markshare">マーク・共有</button>
   </div>
 
-  <!-- 蝓ｺ譛ｬ -->
+  <!-- 基本 -->
   <div class="panel active" id="panel-basic" role="tabpanel" aria-labelledby="tab-basic">
     <div class="row" id="tuningSelectors"></div>
 
     <div class="row">
-      <label>譛螟ｧ繝輔Ξ繝・ヨ
-        <input id="maxFret" type="number" min="0" max="24" value="12" />
+      <label class="rangeField">フレット表示範囲
+        <div class="rangeInputs">
+          <input id="viewStart" aria-label="フレット表示範囲 始点" type="number" min="1" max="36" step="1" value="1" />
+          <span class="rangeSep" aria-hidden="true">～</span>
+          <input id="viewEnd" aria-label="フレット表示範囲 終点" type="number" min="1" max="36" step="1" value="12" />
+        </div>
       </label>
 
-      <label>陦ｨ遉ｺ遽・峇 髢句ｧ・
-        <input id="viewStart" type="number" min="0" max="24" value="1" />
-      </label>
-
-      <label>陦ｨ遉ｺ遽・峇 邨ゆｺ・
-        <input id="viewEnd" type="number" min="0" max="24" value="12" />
-      </label>
-
-      <label>髻ｳ蜷崎｡ｨ遉ｺ
+      <label>音名表示
         <select id="showNoteNames">
-          <option value="on">繧ｪ繝ｳ</option>
-          <option value="off">繧ｪ繝・/option>
+          <option value="abc">ABC</option>
+          <option value="solfege">ドレミ</option>
+          <option value="off">オフ</option>
         </select>
       </label>
 
-      <label>陦ｨ險倥Δ繝ｼ繝・
+      <label>調合モード
         <select id="accMode">
-          <option value="sharp">#縺ｧ邨ｱ荳・・笙ｯ・・/option>
-          <option value="flat">笙ｭ縺ｧ邨ｱ荳・・笙ｭ・・/option>
-          <option value="both">荳｡譁ｹ・・笙ｯ/D笙ｭ・・/option>
+          <option value="sharp">#で統一 (C#)</option>
+          <option value="flat">bで統一 (Db)</option>
+          <option value="both">両方 (C#/Db)</option>
         </select>
       </label>
     </div>
   </div>
 
-  <!-- 蠑ｷ隱ｿ陦ｨ遉ｺ -->
+  <!-- ハイライト -->
   <div class="panel" id="panel-highlight" role="tabpanel" aria-labelledby="tab-highlight">
     <div class="row">
-      <label>繧ｹ繧ｱ繝ｼ繝ｫ
+      <label>スケール
         <select id="scaleType">
-          <option value="off">繧ｪ繝・/option>
-          <option value="major">繝｡繧ｸ繝｣繝ｼ</option>
-          <option value="minor">繝翫メ繝･繝ｩ繝ｫ繝槭う繝翫・</option>
+          <option value="off">オフ</option>
+          <option value="major">メジャー</option>
+          <option value="minor">ナチュラルマイナー</option>
         </select>
       </label>
-      <label>繧ｹ繧ｱ繝ｼ繝ｫKey
+      <label>スケール Key
         <select id="scaleRoot"></select>
       </label>
     </div>
 
     <div class="row">
-      <label>繧ｳ繝ｼ繝牙ｼｷ隱ｿ
+      <label>コード表示
         <select id="chordOn">
-          <option value="off">繧ｪ繝・/option>
-          <option value="on">繧ｪ繝ｳ</option>
+          <option value="off">オフ</option>
+          <option value="on">オン</option>
         </select>
       </label>
-      <label>繧ｳ繝ｼ繝嘘oot
+      <label>コード Root
         <select id="chordRoot"></select>
       </label>
-      <label>Quality
+      <label>コードタイプ
         <select id="chordQuality"></select>
       </label>
     </div>
   </div>
 
-  <!-- 繝槭・繧ｯ・・・譛・-->
+  <!-- マーク・共有 -->
   <div class="panel" id="panel-markshare" role="tabpanel" aria-labelledby="tab-markshare">
     <div class="row">
-      <label>謠冗判繝｢繝ｼ繝・
+      <label>描画モード
         <select id="drawMode">
-          <option value="on">繧ｪ繝ｳ</option>
-          <option value="off">繧ｪ繝・/option>
+          <option value="on">オン</option>
+          <option value="off">オフ</option>
         </select>
       </label>
 
-      <label>蠖｢
-        <div class="pillGroup" aria-label="蠖｢">
-          <button class="pill" id="shapeCircle" aria-pressed="true" type="button">笳ｯ</button>
-          <button class="pill" id="shapeSquare" aria-pressed="false" type="button">笆｡</button>
+      <label>形
+        <div class="pillGroup" aria-label="形">
+          <button class="pill" id="shapeCircle" aria-pressed="true" type="button">丸</button>
+          <button class="pill" id="shapeSquare" aria-pressed="false" type="button">四角</button>
         </div>
       </label>
 
-      <label>濶ｲ
-        <div class="pillGroup" aria-label="濶ｲ">
-          <button class="pill" id="colorRed" aria-pressed="true" type="button"><span class="colorDot" style="background:var(--mk-red)"></span>襍､</button>
-          <button class="pill" id="colorGreen" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-green)"></span>邱・/button>
-          <button class="pill" id="colorYellow" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-yellow)"></span>鮟・/button>
+      <label>色
+        <div class="pillGroup" aria-label="色">
+          <button class="pill" id="colorRed" aria-pressed="true" type="button"><span class="colorDot" style="background:var(--mk-red)"></span>赤</button>
+          <button class="pill" id="colorGreen" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-green)"></span>緑</button>
+          <button class="pill" id="colorYellow" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-yellow)"></span>黄</button>
         </div>
       </label>
 
-      <label>縲
-        <button class="btn" id="clearMarksBtn" type="button">繝槭・繧ｯ蜈ｨ豸亥悉</button>
+      <label>操作
+        <button class="btn" id="clearMarksBtn" type="button">マーク全削除</button>
       </label>
 
-      <label>迥ｶ諷句・譛峨Μ繝ｳ繧ｯ
-        <button class="btn" id="copyLinkBtn" type="button">繝ｪ繝ｳ繧ｯ繧偵さ繝斐・</button>
+      <label>状態共有リンク
+        <button class="btn" id="copyLinkBtn" type="button">リンクをコピー</button>
       </label>
     </div>
   </div>
 
   <!-- always visible bottom-right -->
   <div class="exportBtnWrap">
-    <button class="btn btnPrimary" id="makePngBtn" type="button">PNG逕滓・</button>
+    <button class="btn btnPrimary" id="makePngBtn" type="button">PNG出力</button>
   </div>
 </div>
 
 <div class="boardWrap">
   <div id="board"></div>
 </div>
+<div class="siteFooter">© 2026 Yurito. All rights reserved.</div>
 
 <!-- PNG Modal -->
 <div class="modalBack" id="pngModalBack" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="PNG譖ｸ縺榊・縺・>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="PNG書き出し">
     <div class="modalHead">
-      <div class="modalTitle">PNG繝励Ξ繝薙Η繝ｼ</div>
-      <button class="btn" id="closeModalBtn" type="button">髢峨§繧・/button>
+      <div class="modalTitle">PNGプレビュー</div>
+      <button class="btn" id="closeModalBtn" type="button">閉じる</button>
     </div>
     <div class="modalBody">
-      <img id="pngPreview" class="previewImg" alt="PNG繝励Ξ繝薙Η繝ｼ・磯聞謚ｼ縺励〒菫晏ｭ倥〒縺阪∪縺呻ｼ・ />
+      <img id="pngPreview" class="previewImg" alt="PNGプレビュー（読み込み中）" />
       <div class="modalActions">
-        <button class="btn" id="savePngBtn" type="button" disabled>菫晏ｭ・/button>
-        <button class="btn" id="sharePngBtn" type="button" disabled>蜈ｱ譛・/button>
+        <button class="btn" id="savePngBtn" type="button" disabled>保存</button>
+        <button class="btn" id="sharePngBtn" type="button" disabled>共有</button>
       </div>
     </div>
   </div>
@@ -359,31 +386,64 @@
 ========================= */
 const NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 const SHARP_TO_FLAT = { "C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb" };
+const NOTE_TO_SOLFEGE = {
+  "C":"ド","C#":"ド#","Db":"レb",
+  "D":"レ","D#":"レ#","Eb":"ミb",
+  "E":"ミ",
+  "F":"ファ","F#":"ファ#","Gb":"ソb",
+  "G":"ソ","G#":"ソ#","Ab":"ラb",
+  "A":"ラ","A#":"ラ#","Bb":"シb",
+  "B":"シ"
+};
 
 const NOTE_CHOICES = [
   { label:"C", sharp:"C" },
-  { label:"C笙ｯ/D笙ｭ", sharp:"C#" },
+  { label:"C#/Db", sharp:"C#" },
   { label:"D", sharp:"D" },
-  { label:"D笙ｯ/E笙ｭ", sharp:"D#" },
+  { label:"D#/Eb", sharp:"D#" },
   { label:"E", sharp:"E" },
   { label:"F", sharp:"F" },
-  { label:"F笙ｯ/G笙ｭ", sharp:"F#" },
+  { label:"F#/Gb", sharp:"F#" },
   { label:"G", sharp:"G" },
-  { label:"G笙ｯ/A笙ｭ", sharp:"G#" },
+  { label:"G#/Ab", sharp:"G#" },
   { label:"A", sharp:"A" },
-  { label:"A笙ｯ/B笙ｭ", sharp:"A#" },
+  { label:"A#/Bb", sharp:"A#" },
   { label:"B", sharp:"B" },
 ];
 
 const idx = (n) => NOTES.indexOf(n);
 
-function toDisplay(noteSharp, mode){
-  if (mode === "sharp") return noteSharp.replace("#","笙ｯ");
+function toDisplayAbc(noteSharp, mode){
+  if (mode === "sharp") return noteSharp;
   const flatRaw = SHARP_TO_FLAT[noteSharp] ?? noteSharp;
-  const flat = flatRaw.replace("b","笙ｭ");
+  const flat = flatRaw;
   if (mode === "flat") return flat;
-  if (SHARP_TO_FLAT[noteSharp]) return `${noteSharp.replace("#","笙ｯ")}/${flat}`;
+  if (SHARP_TO_FLAT[noteSharp]) return `${noteSharp}/${flat}`;
   return noteSharp;
+}
+
+function toDisplaySolfege(noteSharp, mode){
+  if (mode === "sharp") return NOTE_TO_SOLFEGE[noteSharp] ?? noteSharp;
+  const flatRaw = SHARP_TO_FLAT[noteSharp] ?? noteSharp;
+  if (mode === "flat") return NOTE_TO_SOLFEGE[flatRaw] ?? flatRaw;
+  if (SHARP_TO_FLAT[noteSharp]){
+    const sharp = NOTE_TO_SOLFEGE[noteSharp] ?? noteSharp;
+    const flat = NOTE_TO_SOLFEGE[flatRaw] ?? flatRaw;
+    return `${sharp}/${flat}`;
+  }
+  return NOTE_TO_SOLFEGE[noteSharp] ?? noteSharp;
+}
+
+function toDisplay(noteSharp, accMode, labelMode){
+  if (labelMode === "solfege") return toDisplaySolfege(noteSharp, accMode);
+  return toDisplayAbc(noteSharp, accMode);
+}
+
+function normalizeShowNoteNames(value){
+  if (value === "on") return "abc";
+  if (value === "off") return "off";
+  if (value === "abc" || value === "solfege") return value;
+  return "abc";
 }
 
 /* =========================
@@ -400,18 +460,18 @@ function buildScaleSet(rootSharp, type){
 }
 
 const CHORD_QUALITIES = [
-  { id:"M",    label:"M・・ 3 5・・,             semis:[0,4,7] },
-  { id:"m",    label:"m・・ 笙ｭ3 5・・,            semis:[0,3,7] },
-  { id:"sus2", label:"sus2・・ 2 5・・,          semis:[0,2,7] },
-  { id:"sus4", label:"sus4・・ 4 5・・,          semis:[0,5,7] },
-  { id:"dim",  label:"dim・・ 笙ｭ3 笙ｭ5・・,         semis:[0,3,6] },
-  { id:"aug",  label:"aug・・ 3 笙ｯ5・・,          semis:[0,4,8] },
-  { id:"7",    label:"7・・ 3 5 笙ｭ7・・,          semis:[0,4,7,10] },
-  { id:"M7",   label:"M7・・ 3 5 7・・,          semis:[0,4,7,11] },
-  { id:"m7",   label:"m7・・ 笙ｭ3 5 笙ｭ7・・,        semis:[0,3,7,10] },
-  { id:"mM7",  label:"mM7・・ 笙ｭ3 5 7・・,        semis:[0,3,7,11] },
-  { id:"m7b5", label:"m7笙ｭ5・・ 笙ｭ3 笙ｭ5 笙ｭ7・・,     semis:[0,3,6,10] },
-  { id:"dim7", label:"dim7・・ 笙ｭ3 笙ｭ5 ┃7・・,     semis:[0,3,6,9] },
+  { id:"M",    label:"M (1 3 5)",              semis:[0,4,7] },
+  { id:"m",    label:"m (1 b3 5)",             semis:[0,3,7] },
+  { id:"sus2", label:"sus2 (1 2 5)",           semis:[0,2,7] },
+  { id:"sus4", label:"sus4 (1 4 5)",           semis:[0,5,7] },
+  { id:"dim",  label:"dim (1 b3 b5)",          semis:[0,3,6] },
+  { id:"aug",  label:"aug (1 3 #5)",           semis:[0,4,8] },
+  { id:"7",    label:"7 (1 3 5 b7)",           semis:[0,4,7,10] },
+  { id:"M7",   label:"M7 (1 3 5 7)",           semis:[0,4,7,11] },
+  { id:"m7",   label:"m7 (1 b3 5 b7)",         semis:[0,3,7,10] },
+  { id:"mM7",  label:"mM7 (1 b3 5 7)",         semis:[0,3,7,11] },
+  { id:"m7b5", label:"m7b5 (1 b3 b5 b7)",      semis:[0,3,6,10] },
+  { id:"dim7", label:"dim7 (1 b3 b5 bb7)",     semis:[0,3,6,9] },
 ];
 
 function buildChordSet(rootSharp, qualityId){
@@ -425,7 +485,6 @@ function buildChordSet(rootSharp, qualityId){
 ========================= */
 const els = {
   tuningSelectors: document.getElementById("tuningSelectors"),
-  maxFret: document.getElementById("maxFret"),
   viewStart: document.getElementById("viewStart"),
   viewEnd: document.getElementById("viewEnd"),
   showNoteNames: document.getElementById("showNoteNames"),
@@ -474,7 +533,7 @@ for (const t of tabs){
 }
 
 // Tuning selects (input order: 6->1)
-const tuningLabels = ["6蠑ｦ","5蠑ｦ","4蠑ｦ","3蠑ｦ","2蠑ｦ","1蠑ｦ"];
+const tuningLabels = ["6弦","5弦","4弦","3弦","2弦","1弦"];
 const tuningDefault = ["E","A","D","G","B","E"];
 const tuningSelectEls = [];
 
@@ -506,6 +565,8 @@ for (const sel of [els.scaleRoot, els.chordRoot]){
     sel.appendChild(opt);
   }
 }
+els.accMode.value = "both";
+els.scaleType.value = "major";
 els.scaleRoot.value = "C";
 els.chordRoot.value = "C";
 
@@ -556,25 +617,23 @@ function sameMarker(a,b){ return a && b && a.shape===b.shape && a.color===b.colo
 /* =========================
    Helpers: view range clamp
 ========================= */
-function clampViewRange(){
-  let maxF = Number(els.maxFret.value);
-  if (!Number.isFinite(maxF)) maxF = 12;
-  maxF = Math.min(24, Math.max(0, maxF));
-  els.maxFret.value = String(maxF);
+const FRET_MIN = 1;
+const FRET_LIMIT = 36;
 
+function clampViewRange(){
   let s = Number(els.viewStart.value);
   let e = Number(els.viewEnd.value);
-  if (!Number.isFinite(s)) s = 0;
-  if (!Number.isFinite(e)) e = maxF;
+  if (!Number.isFinite(s)) s = FRET_MIN;
+  if (!Number.isFinite(e)) e = 12;
 
-  s = Math.min(maxF, Math.max(0, s));
-  e = Math.min(maxF, Math.max(0, e));
+  s = Math.min(FRET_LIMIT, Math.max(FRET_MIN, s));
+  e = Math.min(FRET_LIMIT, Math.max(FRET_MIN, e));
   if (e < s) e = s;
 
   els.viewStart.value = String(s);
   els.viewEnd.value = String(e);
 
-  return { maxFret: maxF, viewStart: s, viewEnd: e };
+  return { viewStart: s, viewEnd: e };
 }
 
 /* =========================
@@ -589,11 +648,25 @@ function cssVar(name){
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
+function fitBoardSvgSize(svg, intrinsicWidth){
+  const wrap = els.board.parentElement;
+  const wrapWidth = wrap ? wrap.clientWidth - 28 : intrinsicWidth;
+
+  // Fit to viewport, but keep scale in a comfortable range.
+  const fitScale = wrapWidth / intrinsicWidth;
+  const minScale = 0.6;
+  const maxScale = 1.25;
+  const scale = Math.max(minScale, Math.min(maxScale, fitScale));
+
+  svg.style.width = `${Math.round(intrinsicWidth * scale)}px`;
+  svg.style.height = "auto";
+}
+
 function drawFretboard(){
-  const { maxFret, viewStart, viewEnd } = clampViewRange();
+  const { viewStart, viewEnd } = clampViewRange();
   const mode = els.accMode.value;
 
-  const showNames = (els.showNoteNames.value === "on");
+  const labelMode = normalizeShowNoteNames(els.showNoteNames.value);
 
   const scaleType = els.scaleType.value;
   const scaleRoot = els.scaleRoot.value;
@@ -626,6 +699,7 @@ function drawFretboard(){
   const openX = nutX - cellW * 0.62;
 
   const boardH = 360;
+  const footerH = 24;
   const yTop = topPad + 38;
   const yBottom = boardH - bottomPad;
   const stringGap = (yBottom - yTop) / 5;
@@ -636,15 +710,19 @@ function drawFretboard(){
 
   const colCount = visibleFrets.length;
   const width = nutX + (colCount * cellW) + rightPad;
-  const height = boardH;
+  const height = boardH + footerH;
 
   const svg = svgEl("svg", {
+    width,
+    height,
     viewBox: `0 0 ${width} ${height}`,
+    preserveAspectRatio: "xMinYMin meet",
     role: "img",
-    "aria-label": "繧ｮ繧ｿ繝ｼ謖・攸"
+    "aria-label": "ギター指板"
   });
 
   svg.appendChild(svgEl("rect", { x:0, y:0, width, height, fill:"#fff" }));
+  fitBoardSvgSize(svg, width);
 
   // Labels: open
   {
@@ -653,7 +731,7 @@ function drawFretboard(){
       x:x0, y:20, "text-anchor":"middle",
       "font-size": 11, "font-weight": 700, fill: cssVar("--ui-muted"),
       "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
-    })).textContent = "髢区叛蠑ｦ";
+    })).textContent = "開放弦";
 
     svg.appendChild(svgEl("text", {
       x:x0, y:42, "text-anchor":"middle",
@@ -742,15 +820,15 @@ function drawFretboard(){
   const openSW = 3.0;
   const fret12SW = 2.6;
 
-  // Marker stroke widths
-  const markerSW = openSW * 3;         // 9
-  const markerWhiteSW = markerSW + 2;  // 11
-
-  // Note/Marker size tuning (avoid overlap with thick stroke)
-  // Make marker outer size depend on stringGap to avoid touching up/down.
+  // Note/marker size tuning
   const noteR = 18;
-  const safeOuterR = Math.max(12, Math.min(18, (stringGap * 0.5) - (markerSW * 0.55))); // clamp
-  const markerR = Math.min(noteR, safeOuterR); // keep <= note circle
+  const markerSW = openSW * 1.6;
+  const markerWhiteSW = markerSW + 1.2;
+  // Keep marker outside the note, with a target radius range of 18..21.
+  const markerMinR = 18;
+  const markerMaxR = 21;
+  const safeOuterR = Math.max(markerMinR, Math.min(markerMaxR, (stringGap * 0.5) - (markerSW * 0.55)));
+  const markerR = Math.max(noteR + 0.8, safeOuterR);
   const markerDiameter = markerR * 2;
 
   function getFill(noteIndex){
@@ -808,16 +886,19 @@ function drawFretboard(){
         "stroke-width": sw
       }));
 
-      if (showNames){
+      if (labelMode !== "off"){
+        const displayText = toDisplay(noteSharp, mode, labelMode);
+        const noteFontSize = displayText.includes("/") ? 11.5 : 13.5;
+        const noteTextY = y + (noteFontSize * 0.43);
         const text = svgEl("text", {
-          x, y: y + 5.8,
+          x, y: noteTextY,
           "text-anchor":"middle",
-          "font-size": 13.5,
+          "font-size": noteFontSize,
           "font-weight": 600,
           fill:"#111",
           "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
         });
-        text.textContent = toDisplay(noteSharp, mode);
+        text.textContent = displayText;
         svg.appendChild(text);
       }
 
@@ -842,12 +923,13 @@ function drawFretboard(){
             "stroke-linecap":"round"
           }));
         } else {
-          const side = markerDiameter;      // 竊・謠・∴縺・
+          const side = markerDiameter;      // square side equals marker diameter
           const x0 = x - side/2;
           const y0 = y - side/2;
 
           svg.appendChild(svgEl("rect", {
             x:x0, y:y0, width:side, height:side,
+            rx:6.5, ry:6.5,
             fill:"none",
             stroke:"#fff",
             "stroke-width": markerWhiteSW,
@@ -855,6 +937,7 @@ function drawFretboard(){
           }));
           svg.appendChild(svgEl("rect", {
             x:x0, y:y0, width:side, height:side,
+            rx:6.5, ry:6.5,
             fill:"none",
             stroke: mkStroke,
             "stroke-width": markerSW,
@@ -902,6 +985,17 @@ function drawFretboard(){
       svg.appendChild(hit);
     }
   }
+
+  // Footer credit (included in PNG export), placed below the fretboard area.
+  svg.appendChild(svgEl("text", {
+    x: width - 14,
+    y: boardH + footerH - 8,
+    "text-anchor":"end",
+    "font-size": 10.5,
+    "font-weight": 500,
+    fill:"#777",
+    "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+  })).textContent = "© 2026 Yurito. All rights reserved.";
 
   els.board.innerHTML = "";
   els.board.appendChild(svg);
@@ -971,13 +1065,13 @@ function svgToPngBlob(svg, scale=2){
         URL.revokeObjectURL(url);
 
         canvas.toBlob((blob) => {
-          if (!blob) return reject(new Error("PNG逕滓・縺ｫ螟ｱ謨励＠縺ｾ縺励◆"));
+          if (!blob) return reject(new Error("PNG出力に失敗しました"));
           resolve(blob);
         }, "image/png");
       };
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error("SVG隱ｭ縺ｿ霎ｼ縺ｿ縺ｫ螟ｱ謨励＠縺ｾ縺励◆"));
+        reject(new Error("SVG読み込みに失敗しました"));
       };
       img.src = url;
     } catch(err){
@@ -996,7 +1090,7 @@ els.makePngBtn.addEventListener("click", async () => {
   els.sharePngBtn.disabled = true;
 
   els.makePngBtn.disabled = true;
-  els.makePngBtn.textContent = "PNG逕滓・荳ｭ窶ｦ";
+  els.makePngBtn.textContent = "PNG出力中...";
 
   try{
     const blob = await svgToPngBlob(svg, 2);
@@ -1006,7 +1100,7 @@ els.makePngBtn.addEventListener("click", async () => {
     closeModal();
   } finally{
     els.makePngBtn.disabled = false;
-    els.makePngBtn.textContent = "PNG逕滓・";
+    els.makePngBtn.textContent = "PNG出力";
   }
 });
 
@@ -1026,7 +1120,7 @@ els.sharePngBtn.addEventListener("click", async () => {
 
   try{
     if (navigator.canShare && navigator.canShare({ files: [file] })){
-      await navigator.share({ files: [file], title: "謖・攸", text: "" });
+      await navigator.share({ files: [file], title: "ギター指板", text: "" });
       return;
     }
   } catch(_) {}
@@ -1050,13 +1144,12 @@ function b64decode(str){
 }
 
 function getState(){
-  const { maxFret, viewStart, viewEnd } = clampViewRange();
+  const { viewStart, viewEnd } = clampViewRange();
   const tuning = tuningSelectEls.map(s => s.value); // 6->1
   const marks = Array.from(markers.entries()); // [ [key, {shape,color}], ... ]
   return {
     v: 1,
     tuning,
-    maxFret,
     viewStart,
     viewEnd,
     showNoteNames: els.showNoteNames.value,
@@ -1082,11 +1175,10 @@ function applyState(st){
         if (NOTES.includes(st.tuning[i])) tuningSelectEls[i].value = st.tuning[i];
       }
     }
-    if (Number.isFinite(st.maxFret)) els.maxFret.value = String(st.maxFret);
     if (Number.isFinite(st.viewStart)) els.viewStart.value = String(st.viewStart);
     if (Number.isFinite(st.viewEnd)) els.viewEnd.value = String(st.viewEnd);
 
-    if (st.showNoteNames) els.showNoteNames.value = st.showNoteNames;
+    if (st.showNoteNames) els.showNoteNames.value = normalizeShowNoteNames(st.showNoteNames);
     if (st.accMode) els.accMode.value = st.accMode;
 
     if (st.scaleType) els.scaleType.value = st.scaleType;
@@ -1128,10 +1220,10 @@ els.copyLinkBtn.addEventListener("click", async () => {
   const url = buildShareUrl();
   try{
     await navigator.clipboard.writeText(url);
-    els.copyLinkBtn.textContent = "繧ｳ繝斐・縺励∪縺励◆";
-    setTimeout(() => (els.copyLinkBtn.textContent = "繝ｪ繝ｳ繧ｯ繧偵さ繝斐・"), 1200);
+    els.copyLinkBtn.textContent = "コピーしました";
+    setTimeout(() => (els.copyLinkBtn.textContent = "リンクをコピー"), 1200);
   } catch(_) {
-    prompt("縺薙・URL繧偵さ繝斐・縺励※蜈ｱ譛峨＠縺ｦ縺ｭ", url);
+    prompt("このURLをコピーして共有してください", url);
   }
 });
 
@@ -1151,7 +1243,7 @@ els.copyLinkBtn.addEventListener("click", async () => {
    Redraw triggers
 ========================= */
 [
-  els.maxFret, els.viewStart, els.viewEnd,
+  els.viewStart, els.viewEnd,
   els.accMode, els.showNoteNames,
   els.scaleType, els.scaleRoot,
   els.chordOn, els.chordRoot, els.chordQuality,
@@ -1164,6 +1256,7 @@ tuningSelectEls.forEach(sel => sel.addEventListener("change", drawFretboard));
    First draw
 ========================= */
 drawFretboard();
+window.addEventListener("resize", drawFretboard);
 </script>
 </body>
 </html>
