@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>指板表ジェネレーター</title>
+<title>Yuritoの考えた最強のソロギターツール</title>
 
 <style>
   :root{
@@ -14,9 +14,9 @@
     --note-stroke-strong:#111;
 
     /* highlight fills */
-    --fill-scale:#e6f2ff;   /* 水色（お気に入りのまま） */
-    --fill-chord:#ffe6a3;   /* 黄色 */
-    --fill-both:#dff0a6;    /* 黄緑（混色） */
+    --fill-scale:#e6f2ff;   /* 豌ｴ濶ｲ・医♀豌励↓蜈･繧翫・縺ｾ縺ｾ・・*/
+    --fill-chord:#ffe6a3;   /* 鮟・牡 */
+    --fill-both:#dff0a6;    /* 鮟・ｷ托ｼ域ｷｷ濶ｲ・・*/
 
     /* marker colors */
     --mk-red:#e1524a;
@@ -38,7 +38,7 @@
     border:1px solid var(--ui-border);
     border-radius:14px;
     padding:12px;
-    padding-bottom:64px; /* 右下固定ボタンの分 */
+    padding-bottom:64px; /* 蜿ｳ荳句崋螳壹・繧ｿ繝ｳ縺ｮ蛻・*/
     max-width:1200px;
     background:#fff;
     position:relative;
@@ -217,72 +217,72 @@
 </head>
 
 <body>
-<h1>指板表ジェネレーター</h1>
+<h1>Yuritoの考えた最強のソロギターツール</h1>
 
 <div class="card">
-  <div class="tabs" role="tablist" aria-label="設定タブ">
-    <button class="tabBtn" role="tab" id="tab-basic" aria-selected="true" aria-controls="panel-basic">基本</button>
-    <button class="tabBtn" role="tab" id="tab-highlight" aria-selected="false" aria-controls="panel-highlight">強調表示</button>
-    <button class="tabBtn" role="tab" id="tab-markshare" aria-selected="false" aria-controls="panel-markshare">マーク＆共有</button>
+  <div class="tabs" role="tablist" aria-label="險ｭ螳壹ち繝・>
+    <button class="tabBtn" role="tab" id="tab-basic" aria-selected="true" aria-controls="panel-basic">蝓ｺ譛ｬ</button>
+    <button class="tabBtn" role="tab" id="tab-highlight" aria-selected="false" aria-controls="panel-highlight">蠑ｷ隱ｿ陦ｨ遉ｺ</button>
+    <button class="tabBtn" role="tab" id="tab-markshare" aria-selected="false" aria-controls="panel-markshare">繝槭・繧ｯ・・・譛・/button>
   </div>
 
-  <!-- 基本 -->
+  <!-- 蝓ｺ譛ｬ -->
   <div class="panel active" id="panel-basic" role="tabpanel" aria-labelledby="tab-basic">
     <div class="row" id="tuningSelectors"></div>
 
     <div class="row">
-      <label>最大フレット
+      <label>譛螟ｧ繝輔Ξ繝・ヨ
         <input id="maxFret" type="number" min="0" max="24" value="12" />
       </label>
 
-      <label>表示範囲 開始
+      <label>陦ｨ遉ｺ遽・峇 髢句ｧ・
         <input id="viewStart" type="number" min="0" max="24" value="1" />
       </label>
 
-      <label>表示範囲 終了
+      <label>陦ｨ遉ｺ遽・峇 邨ゆｺ・
         <input id="viewEnd" type="number" min="0" max="24" value="12" />
       </label>
 
-      <label>音名表示
+      <label>髻ｳ蜷崎｡ｨ遉ｺ
         <select id="showNoteNames">
-          <option value="on">オン</option>
-          <option value="off">オフ</option>
+          <option value="on">繧ｪ繝ｳ</option>
+          <option value="off">繧ｪ繝・/option>
         </select>
       </label>
 
-      <label>表記モード
+      <label>陦ｨ險倥Δ繝ｼ繝・
         <select id="accMode">
-          <option value="sharp">#で統一（C♯）</option>
-          <option value="flat">♭で統一（D♭）</option>
-          <option value="both">両方（C♯/D♭）</option>
+          <option value="sharp">#縺ｧ邨ｱ荳・・笙ｯ・・/option>
+          <option value="flat">笙ｭ縺ｧ邨ｱ荳・・笙ｭ・・/option>
+          <option value="both">荳｡譁ｹ・・笙ｯ/D笙ｭ・・/option>
         </select>
       </label>
     </div>
   </div>
 
-  <!-- 強調表示 -->
+  <!-- 蠑ｷ隱ｿ陦ｨ遉ｺ -->
   <div class="panel" id="panel-highlight" role="tabpanel" aria-labelledby="tab-highlight">
     <div class="row">
-      <label>スケール
+      <label>繧ｹ繧ｱ繝ｼ繝ｫ
         <select id="scaleType">
-          <option value="off">オフ</option>
-          <option value="major">メジャー</option>
-          <option value="minor">ナチュラルマイナー</option>
+          <option value="off">繧ｪ繝・/option>
+          <option value="major">繝｡繧ｸ繝｣繝ｼ</option>
+          <option value="minor">繝翫メ繝･繝ｩ繝ｫ繝槭う繝翫・</option>
         </select>
       </label>
-      <label>スケールKey
+      <label>繧ｹ繧ｱ繝ｼ繝ｫKey
         <select id="scaleRoot"></select>
       </label>
     </div>
 
     <div class="row">
-      <label>コード強調
+      <label>繧ｳ繝ｼ繝牙ｼｷ隱ｿ
         <select id="chordOn">
-          <option value="off">オフ</option>
-          <option value="on">オン</option>
+          <option value="off">繧ｪ繝・/option>
+          <option value="on">繧ｪ繝ｳ</option>
         </select>
       </label>
-      <label>コードRoot
+      <label>繧ｳ繝ｼ繝嘘oot
         <select id="chordRoot"></select>
       </label>
       <label>Quality
@@ -291,44 +291,44 @@
     </div>
   </div>
 
-  <!-- マーク＆共有 -->
+  <!-- 繝槭・繧ｯ・・・譛・-->
   <div class="panel" id="panel-markshare" role="tabpanel" aria-labelledby="tab-markshare">
     <div class="row">
-      <label>描画モード
+      <label>謠冗判繝｢繝ｼ繝・
         <select id="drawMode">
-          <option value="on">オン</option>
-          <option value="off">オフ</option>
+          <option value="on">繧ｪ繝ｳ</option>
+          <option value="off">繧ｪ繝・/option>
         </select>
       </label>
 
-      <label>形
-        <div class="pillGroup" aria-label="形">
-          <button class="pill" id="shapeCircle" aria-pressed="true" type="button">◯</button>
-          <button class="pill" id="shapeSquare" aria-pressed="false" type="button">□</button>
+      <label>蠖｢
+        <div class="pillGroup" aria-label="蠖｢">
+          <button class="pill" id="shapeCircle" aria-pressed="true" type="button">笳ｯ</button>
+          <button class="pill" id="shapeSquare" aria-pressed="false" type="button">笆｡</button>
         </div>
       </label>
 
-      <label>色
-        <div class="pillGroup" aria-label="色">
-          <button class="pill" id="colorRed" aria-pressed="true" type="button"><span class="colorDot" style="background:var(--mk-red)"></span>赤</button>
-          <button class="pill" id="colorGreen" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-green)"></span>緑</button>
-          <button class="pill" id="colorYellow" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-yellow)"></span>黄</button>
+      <label>濶ｲ
+        <div class="pillGroup" aria-label="濶ｲ">
+          <button class="pill" id="colorRed" aria-pressed="true" type="button"><span class="colorDot" style="background:var(--mk-red)"></span>襍､</button>
+          <button class="pill" id="colorGreen" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-green)"></span>邱・/button>
+          <button class="pill" id="colorYellow" aria-pressed="false" type="button"><span class="colorDot" style="background:var(--mk-yellow)"></span>鮟・/button>
         </div>
       </label>
 
-      <label>　
-        <button class="btn" id="clearMarksBtn" type="button">マーク全消去</button>
+      <label>縲
+        <button class="btn" id="clearMarksBtn" type="button">繝槭・繧ｯ蜈ｨ豸亥悉</button>
       </label>
 
-      <label>状態共有リンク
-        <button class="btn" id="copyLinkBtn" type="button">リンクをコピー</button>
+      <label>迥ｶ諷句・譛峨Μ繝ｳ繧ｯ
+        <button class="btn" id="copyLinkBtn" type="button">繝ｪ繝ｳ繧ｯ繧偵さ繝斐・</button>
       </label>
     </div>
   </div>
 
   <!-- always visible bottom-right -->
   <div class="exportBtnWrap">
-    <button class="btn btnPrimary" id="makePngBtn" type="button">PNG生成</button>
+    <button class="btn btnPrimary" id="makePngBtn" type="button">PNG逕滓・</button>
   </div>
 </div>
 
@@ -338,16 +338,16 @@
 
 <!-- PNG Modal -->
 <div class="modalBack" id="pngModalBack" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="PNG書き出し">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="PNG譖ｸ縺榊・縺・>
     <div class="modalHead">
-      <div class="modalTitle">PNGプレビュー</div>
-      <button class="btn" id="closeModalBtn" type="button">閉じる</button>
+      <div class="modalTitle">PNG繝励Ξ繝薙Η繝ｼ</div>
+      <button class="btn" id="closeModalBtn" type="button">髢峨§繧・/button>
     </div>
     <div class="modalBody">
-      <img id="pngPreview" class="previewImg" alt="PNGプレビュー（長押しで保存できます）" />
+      <img id="pngPreview" class="previewImg" alt="PNG繝励Ξ繝薙Η繝ｼ・磯聞謚ｼ縺励〒菫晏ｭ倥〒縺阪∪縺呻ｼ・ />
       <div class="modalActions">
-        <button class="btn" id="savePngBtn" type="button" disabled>保存</button>
-        <button class="btn" id="sharePngBtn" type="button" disabled>共有</button>
+        <button class="btn" id="savePngBtn" type="button" disabled>菫晏ｭ・/button>
+        <button class="btn" id="sharePngBtn" type="button" disabled>蜈ｱ譛・/button>
       </div>
     </div>
   </div>
@@ -362,27 +362,27 @@ const SHARP_TO_FLAT = { "C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb" };
 
 const NOTE_CHOICES = [
   { label:"C", sharp:"C" },
-  { label:"C♯/D♭", sharp:"C#" },
+  { label:"C笙ｯ/D笙ｭ", sharp:"C#" },
   { label:"D", sharp:"D" },
-  { label:"D♯/E♭", sharp:"D#" },
+  { label:"D笙ｯ/E笙ｭ", sharp:"D#" },
   { label:"E", sharp:"E" },
   { label:"F", sharp:"F" },
-  { label:"F♯/G♭", sharp:"F#" },
+  { label:"F笙ｯ/G笙ｭ", sharp:"F#" },
   { label:"G", sharp:"G" },
-  { label:"G♯/A♭", sharp:"G#" },
+  { label:"G笙ｯ/A笙ｭ", sharp:"G#" },
   { label:"A", sharp:"A" },
-  { label:"A♯/B♭", sharp:"A#" },
+  { label:"A笙ｯ/B笙ｭ", sharp:"A#" },
   { label:"B", sharp:"B" },
 ];
 
 const idx = (n) => NOTES.indexOf(n);
 
 function toDisplay(noteSharp, mode){
-  if (mode === "sharp") return noteSharp.replace("#","♯");
+  if (mode === "sharp") return noteSharp.replace("#","笙ｯ");
   const flatRaw = SHARP_TO_FLAT[noteSharp] ?? noteSharp;
-  const flat = flatRaw.replace("b","♭");
+  const flat = flatRaw.replace("b","笙ｭ");
   if (mode === "flat") return flat;
-  if (SHARP_TO_FLAT[noteSharp]) return `${noteSharp.replace("#","♯")}/${flat}`;
+  if (SHARP_TO_FLAT[noteSharp]) return `${noteSharp.replace("#","笙ｯ")}/${flat}`;
   return noteSharp;
 }
 
@@ -400,18 +400,18 @@ function buildScaleSet(rootSharp, type){
 }
 
 const CHORD_QUALITIES = [
-  { id:"M",    label:"M（1 3 5）",             semis:[0,4,7] },
-  { id:"m",    label:"m（1 ♭3 5）",            semis:[0,3,7] },
-  { id:"sus2", label:"sus2（1 2 5）",          semis:[0,2,7] },
-  { id:"sus4", label:"sus4（1 4 5）",          semis:[0,5,7] },
-  { id:"dim",  label:"dim（1 ♭3 ♭5）",         semis:[0,3,6] },
-  { id:"aug",  label:"aug（1 3 ♯5）",          semis:[0,4,8] },
-  { id:"7",    label:"7（1 3 5 ♭7）",          semis:[0,4,7,10] },
-  { id:"M7",   label:"M7（1 3 5 7）",          semis:[0,4,7,11] },
-  { id:"m7",   label:"m7（1 ♭3 5 ♭7）",        semis:[0,3,7,10] },
-  { id:"mM7",  label:"mM7（1 ♭3 5 7）",        semis:[0,3,7,11] },
-  { id:"m7b5", label:"m7♭5（1 ♭3 ♭5 ♭7）",     semis:[0,3,6,10] },
-  { id:"dim7", label:"dim7（1 ♭3 ♭5 𝄫7）",     semis:[0,3,6,9] },
+  { id:"M",    label:"M・・ 3 5・・,             semis:[0,4,7] },
+  { id:"m",    label:"m・・ 笙ｭ3 5・・,            semis:[0,3,7] },
+  { id:"sus2", label:"sus2・・ 2 5・・,          semis:[0,2,7] },
+  { id:"sus4", label:"sus4・・ 4 5・・,          semis:[0,5,7] },
+  { id:"dim",  label:"dim・・ 笙ｭ3 笙ｭ5・・,         semis:[0,3,6] },
+  { id:"aug",  label:"aug・・ 3 笙ｯ5・・,          semis:[0,4,8] },
+  { id:"7",    label:"7・・ 3 5 笙ｭ7・・,          semis:[0,4,7,10] },
+  { id:"M7",   label:"M7・・ 3 5 7・・,          semis:[0,4,7,11] },
+  { id:"m7",   label:"m7・・ 笙ｭ3 5 笙ｭ7・・,        semis:[0,3,7,10] },
+  { id:"mM7",  label:"mM7・・ 笙ｭ3 5 7・・,        semis:[0,3,7,11] },
+  { id:"m7b5", label:"m7笙ｭ5・・ 笙ｭ3 笙ｭ5 笙ｭ7・・,     semis:[0,3,6,10] },
+  { id:"dim7", label:"dim7・・ 笙ｭ3 笙ｭ5 ┃7・・,     semis:[0,3,6,9] },
 ];
 
 function buildChordSet(rootSharp, qualityId){
@@ -474,7 +474,7 @@ for (const t of tabs){
 }
 
 // Tuning selects (input order: 6->1)
-const tuningLabels = ["6弦","5弦","4弦","3弦","2弦","1弦"];
+const tuningLabels = ["6蠑ｦ","5蠑ｦ","4蠑ｦ","3蠑ｦ","2蠑ｦ","1蠑ｦ"];
 const tuningDefault = ["E","A","D","G","B","E"];
 const tuningSelectEls = [];
 
@@ -641,7 +641,7 @@ function drawFretboard(){
   const svg = svgEl("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
-    "aria-label": "ギター指板"
+    "aria-label": "繧ｮ繧ｿ繝ｼ謖・攸"
   });
 
   svg.appendChild(svgEl("rect", { x:0, y:0, width, height, fill:"#fff" }));
@@ -653,7 +653,7 @@ function drawFretboard(){
       x:x0, y:20, "text-anchor":"middle",
       "font-size": 11, "font-weight": 700, fill: cssVar("--ui-muted"),
       "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
-    })).textContent = "開放弦";
+    })).textContent = "髢区叛蠑ｦ";
 
     svg.appendChild(svgEl("text", {
       x:x0, y:42, "text-anchor":"middle",
@@ -842,7 +842,7 @@ function drawFretboard(){
             "stroke-linecap":"round"
           }));
         } else {
-          const side = markerDiameter;      // ← 揃えた
+          const side = markerDiameter;      // 竊・謠・∴縺・
           const x0 = x - side/2;
           const y0 = y - side/2;
 
@@ -971,13 +971,13 @@ function svgToPngBlob(svg, scale=2){
         URL.revokeObjectURL(url);
 
         canvas.toBlob((blob) => {
-          if (!blob) return reject(new Error("PNG生成に失敗しました"));
+          if (!blob) return reject(new Error("PNG逕滓・縺ｫ螟ｱ謨励＠縺ｾ縺励◆"));
           resolve(blob);
         }, "image/png");
       };
       img.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error("SVG読み込みに失敗しました"));
+        reject(new Error("SVG隱ｭ縺ｿ霎ｼ縺ｿ縺ｫ螟ｱ謨励＠縺ｾ縺励◆"));
       };
       img.src = url;
     } catch(err){
@@ -996,7 +996,7 @@ els.makePngBtn.addEventListener("click", async () => {
   els.sharePngBtn.disabled = true;
 
   els.makePngBtn.disabled = true;
-  els.makePngBtn.textContent = "PNG生成中…";
+  els.makePngBtn.textContent = "PNG逕滓・荳ｭ窶ｦ";
 
   try{
     const blob = await svgToPngBlob(svg, 2);
@@ -1006,7 +1006,7 @@ els.makePngBtn.addEventListener("click", async () => {
     closeModal();
   } finally{
     els.makePngBtn.disabled = false;
-    els.makePngBtn.textContent = "PNG生成";
+    els.makePngBtn.textContent = "PNG逕滓・";
   }
 });
 
@@ -1026,7 +1026,7 @@ els.sharePngBtn.addEventListener("click", async () => {
 
   try{
     if (navigator.canShare && navigator.canShare({ files: [file] })){
-      await navigator.share({ files: [file], title: "指板", text: "" });
+      await navigator.share({ files: [file], title: "謖・攸", text: "" });
       return;
     }
   } catch(_) {}
@@ -1128,10 +1128,10 @@ els.copyLinkBtn.addEventListener("click", async () => {
   const url = buildShareUrl();
   try{
     await navigator.clipboard.writeText(url);
-    els.copyLinkBtn.textContent = "コピーしました";
-    setTimeout(() => (els.copyLinkBtn.textContent = "リンクをコピー"), 1200);
+    els.copyLinkBtn.textContent = "繧ｳ繝斐・縺励∪縺励◆";
+    setTimeout(() => (els.copyLinkBtn.textContent = "繝ｪ繝ｳ繧ｯ繧偵さ繝斐・"), 1200);
   } catch(_) {
-    prompt("このURLをコピーして共有してね", url);
+    prompt("縺薙・URL繧偵さ繝斐・縺励※蜈ｱ譛峨＠縺ｦ縺ｭ", url);
   }
 });
 
@@ -1167,3 +1167,4 @@ drawFretboard();
 </script>
 </body>
 </html>
+
