@@ -4,35 +4,72 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Yuritoの考えた最強のソロギターツール(仮)</title>
+<script>
+  const APP_TITLE = "Yuritoの考えた最強のソロギターツール(仮)";
+</script>
 
 <style>
   :root{
-    --ui-border:#ddd;
-    --ui-muted:#666;
+    --ui-text:#111827;
+    --ui-title:#0f172a;
+    --ui-border:#d7deea;
+    --ui-muted:#5b6475;
+    --ui-accent:#2f6fed;
+    --ui-accent-soft:rgba(47,111,237,.2);
+    --ui-accent-strong:#2f6fed;
+    --ui-bg:#f4f7fb;
+    --ui-surface:#ffffff;
+    --ui-surface-soft:#f8faff;
+    --ui-body-grad-start:#eef4ff;
+    --ui-body-grad-end:#f2f6fc;
+    --ui-panel-head-border:#e8edf6;
+    --ui-panel-head-start:#fbfdff;
+    --ui-panel-head-end:#f3f7ff;
+    --ui-panel-title:#1e293b;
+    --ui-toggle-border:#d3dbeb;
+    --ui-toggle-text:#2c3e66;
+    --ui-field-border:#ced6e6;
+    --ui-field-bg:#ffffff;
+    --ui-field-text:#111827;
+    --ui-pill-border:#cfd8e8;
+    --ui-board-bg-start:#ffffff;
+    --ui-board-bg-end:#f8fbff;
+    --ui-svg-bg:#ffffff;
+    --ui-svg-text:#111;
+    --ui-fret-line:#333;
+    --ui-string:#444;
+    --ui-dot:#d9d9d9;
+    --ui-footer:#666;
+    --ui-btn-grad-start:#3f7df5;
+    --ui-btn-grad-end:#2f6fed;
 
-    --note-stroke:#d5d5d5;
-    --note-stroke-strong:#111;
+    --note-stroke:#cfd7e6;
+    --note-stroke-strong:#223047;
 
     /* highlight fills */
-    --fill-scale:#e6f2ff;   /* scale notes */
-    --fill-chord:#ffe6a3;   /* chord tones */
-    --fill-both:#dff0a6;    /* both scale + chord */
+    --fill-scale:#e7f0ff;   /* scale notes */
+    --fill-chord:#ffe9be;   /* chord tones */
+    --fill-both:#dff6df;    /* both scale + chord */
 
     /* marker colors */
     --mk-red:#e1524a;
     --mk-green:#2fb072;
     --mk-yellow:#e0b100;
 
-    --shadow: 0 10px 30px rgba(0,0,0,.18);
+    --shadow: 0 10px 30px rgba(17,24,39,.12);
   }
 
+  html{
+    scrollbar-gutter: stable;
+  }
   body{
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     padding: 20px;
-    background:#fff;
-    color:#111;
+    background: radial-gradient(1400px 800px at 10% -20%, var(--ui-body-grad-start) 0%, var(--ui-bg) 55%, var(--ui-body-grad-end) 100%);
+    color:var(--ui-text);
+    overflow-y: scroll;
   }
-  h1{ margin:0 0 14px; font-size:22px; }
+  h1{ margin:0 0 14px; font-size:22px; color:var(--ui-title); }
 
   .card{
     border:1px solid var(--ui-border);
@@ -40,16 +77,17 @@
     padding:12px;
     padding-bottom:64px; /* reserve space for fixed export button */
     max-width:1200px;
-    background:#fff;
+    background:var(--ui-surface-soft);
     position:relative;
+    box-shadow: 0 8px 24px rgba(15,23,42,.06);
   }
 
   /* Stacked windows */
   .panelWindow{
-    border:1px solid #e6e8ee;
+    border:1px solid var(--ui-border);
     border-radius:14px;
-    background:#fff;
-    box-shadow:0 2px 10px rgba(0,0,0,.04);
+    background:var(--ui-surface);
+    box-shadow:0 4px 14px rgba(15,23,42,.05);
     margin-bottom:10px;
     overflow:hidden;
   }
@@ -59,17 +97,17 @@
     justify-content:space-between;
     gap:10px;
     padding:10px 12px;
-    border-bottom:1px solid #eef0f5;
-    background:linear-gradient(180deg,#fcfdff 0%,#f8f9fc 100%);
+    border-bottom:1px solid var(--ui-panel-head-border);
+    background:linear-gradient(180deg,var(--ui-panel-head-start) 0%,var(--ui-panel-head-end) 100%);
     cursor:pointer;
   }
   .panelTitle{
     font-size:14px;
     font-weight:800;
-    color:#1a1a1a;
+    color:var(--ui-panel-title);
   }
   .panelToggle{
-    border:1px solid #d4d9e3;
+    border:1px solid var(--ui-toggle-border);
     border-radius:999px;
     width:30px;
     height:30px;
@@ -80,14 +118,14 @@
     font-size:16px;
     line-height:1;
     font-weight:700;
-    color:#324057;
-    background:#fff;
+    color:var(--ui-toggle-text);
+    background:var(--ui-field-bg);
     cursor:pointer;
     transition:all .18s ease;
   }
   .panelToggle:hover{
-    border-color:#9bbfe6;
-    box-shadow:0 0 0 3px rgba(155,191,230,.2);
+    border-color:var(--ui-accent);
+    box-shadow:0 0 0 3px var(--ui-accent-soft);
   }
   .panel{
     padding:10px 12px 12px;
@@ -163,6 +201,15 @@
   #showNoteNames, #chordOn, #drawMode{
     width:118px;
   }
+  #capoFret{
+    width:118px;
+  }
+  #fretNumberMode{
+    width:168px;
+  }
+  #capoHideLeftBtn{
+    min-width:178px;
+  }
   #scaleType{
     width:200px;
   }
@@ -184,22 +231,40 @@
   #makePngBtn{
     min-width:116px;
   }
+  #themePreset{
+    width:150px;
+    font-size:14px;
+  }
+  .themeLabel{
+    font-size:14px;
+    color:var(--ui-muted);
+  }
 
   select, input, button{
     font-size:16px;
     padding:8px 10px;
-    border:1px solid #cfcfcf;
+    border:1px solid var(--ui-field-border);
     border-radius:10px;
-    background:#fff;
+    background:var(--ui-field-bg);
+    color:var(--ui-field-text);
     outline:none;
   }
+  option{
+    color:var(--ui-field-text);
+    background:var(--ui-field-bg);
+  }
   select:focus, input:focus, button:focus{
-    border-color:#9bbfe6;
-    box-shadow:0 0 0 3px rgba(155,191,230,.25);
+    border-color:var(--ui-accent);
+    box-shadow:0 0 0 3px var(--ui-accent-soft);
   }
 
   .btn{ cursor:pointer; }
-  .btnPrimary{ border-color:#9bbfe6; }
+  .btnPrimary{
+    border-color:var(--ui-accent);
+    background:linear-gradient(180deg,var(--ui-btn-grad-start) 0%, var(--ui-btn-grad-end) 100%);
+    color:#fff;
+    font-weight:700;
+  }
 
   .pillGroup{
     display:flex;
@@ -208,8 +273,8 @@
     flex-wrap:wrap;
   }
   .pill{
-    border:1px solid #d5d5d5;
-    background:#fff;
+    border:1px solid var(--ui-pill-border);
+    background:var(--ui-field-bg);
     border-radius:999px;
     padding:8px 10px;
     font-size:14px;
@@ -217,8 +282,8 @@
     user-select:none;
   }
   .pill[aria-pressed="true"]{
-    border-color:#9bbfe6;
-    box-shadow:0 0 0 3px rgba(155,191,230,.25);
+    border-color:var(--ui-accent);
+    box-shadow:0 0 0 3px var(--ui-accent-soft);
     font-weight:700;
   }
 
@@ -246,10 +311,10 @@
   .boardWrap{
     max-width:1200px;
     margin-top:14px;
-    border:1px solid #e3e3e3;
+    border:1px solid var(--ui-border);
     border-radius:14px;
     padding:14px;
-    background:#fff;
+    background:linear-gradient(180deg,var(--ui-board-bg-start) 0%,var(--ui-board-bg-end) 100%);
     overflow-x:auto;
   }
   svg{
@@ -262,7 +327,7 @@
     max-width:1200px;
     margin-top:10px;
     font-size:12px;
-    color:#777;
+    color:var(--ui-footer);
     text-align:right;
     letter-spacing:.02em;
   }
@@ -325,13 +390,16 @@
     .rangeInputs input{ width:92px; }
     #tuningSelectors label{ min-width:84px; }
     #tuningSelectors select{ width:84px; }
-    #showNoteNames, #scaleType, #chordOn, #drawMode,
+    #showNoteNames, #scaleType, #chordOn, #drawMode, #capoFret, #fretNumberMode,
     #scaleRoot, #chordRoot, #accMode, #chordQuality{
       width:100%;
       min-width:0;
     }
-    #clearMarksBtn, #copyLinkBtn{
+    #clearMarksBtn, #copyLinkBtn, #capoHideLeftBtn{
       min-width:0;
+      width:100%;
+    }
+    #themePreset{
       width:100%;
     }
   }
@@ -339,7 +407,7 @@
 </head>
 
 <body>
-<h1>Yuritoの考えた最強のソロギターツール(仮)</h1>
+<h1 id="pageTitle">Yuritoの考えた最強のソロギターツール(仮)</h1>
 
 <div class="card">
   <!-- 基本 -->
@@ -349,7 +417,7 @@
       <button class="panelToggle" id="toggle-basic" type="button" aria-label="基本の表示切替" aria-expanded="true" aria-controls="panel-basic">－</button>
     </div>
     <div class="panel" id="panel-basic">
-      <div style="font-size:14px;font-weight:700;color:#333;margin:2px 0 6px;">チューニング</div>
+      <div style="font-size:14px;font-weight:700;color:var(--ui-panel-title);margin:2px 0 6px;">チューニング</div>
       <div class="row" id="tuningSelectors"></div>
 
       <div class="row">
@@ -374,6 +442,44 @@
             <option value="sharp">#で統一 (C#)</option>
             <option value="flat">bで統一 (Db)</option>
             <option value="both">両方 (C#/Db)</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- カポタスト -->
+  <section class="panelWindow">
+    <div class="panelHead" tabindex="0">
+      <div class="panelTitle">カポタスト</div>
+      <button class="panelToggle" id="toggle-capo" type="button" aria-label="カポタストの表示切替" aria-expanded="false" aria-controls="panel-capo">▾</button>
+    </div>
+    <div class="panel is-hidden" id="panel-capo">
+      <div class="row">
+        <label>カポ位置
+          <select id="capoFret">
+            <option value="0">なし</option>
+            <option value="1">1フレット</option>
+            <option value="2">2フレット</option>
+            <option value="3">3フレット</option>
+            <option value="4">4フレット</option>
+            <option value="5">5フレット</option>
+            <option value="6">6フレット</option>
+            <option value="7">7フレット</option>
+            <option value="8">8フレット</option>
+            <option value="9">9フレット</option>
+            <option value="10">10フレット</option>
+            <option value="11">11フレット</option>
+            <option value="12">12フレット</option>
+          </select>
+        </label>
+        <label>左側表示
+          <button class="btn" id="capoHideLeftBtn" type="button" aria-pressed="true">カポより左を非表示: ON</button>
+        </label>
+        <label>フレット数表示
+          <select id="fretNumberMode">
+            <option value="absolute">絶対フレット数</option>
+            <option value="relative">相対フレット数</option>
           </select>
         </label>
       </div>
@@ -457,6 +563,11 @@
 
   <!-- always visible bottom-right -->
   <div class="exportBtnWrap">
+    <span class="themeLabel">テーマ</span>
+    <select id="themePreset" aria-label="テーマ選択">
+      <option value="light">ライト</option>
+      <option value="dark">ダーク</option>
+    </select>
     <button class="btn" id="copyLinkBtn" type="button">共有リンクをコピー</button>
     <button class="btn btnPrimary" id="makePngBtn" type="button">画像出力</button>
   </div>
@@ -498,6 +609,93 @@ const NOTE_TO_SOLFEGE = {
   "G":"ソ","G#":"ソ#","Ab":"ラb",
   "A":"ラ","A#":"ラ#","Bb":"シb",
   "B":"シ"
+};
+
+const THEME_PRESETS = {
+  light: {
+    "--ui-text":"#111827",
+    "--ui-title":"#0f172a",
+    "--ui-border":"#d7deea",
+    "--ui-muted":"#5b6475",
+    "--ui-accent":"#2f6fed",
+    "--ui-accent-soft":"rgba(47,111,237,.2)",
+    "--ui-accent-strong":"#2f6fed",
+    "--ui-bg":"#f4f7fb",
+    "--ui-surface":"#ffffff",
+    "--ui-surface-soft":"#f8faff",
+    "--ui-body-grad-start":"#eef4ff",
+    "--ui-body-grad-end":"#f2f6fc",
+    "--ui-panel-head-border":"#e8edf6",
+    "--ui-panel-head-start":"#fbfdff",
+    "--ui-panel-head-end":"#f3f7ff",
+    "--ui-panel-title":"#1e293b",
+    "--ui-toggle-border":"#d3dbeb",
+    "--ui-toggle-text":"#2c3e66",
+    "--ui-field-border":"#ced6e6",
+    "--ui-field-bg":"#ffffff",
+    "--ui-field-text":"#111827",
+    "--ui-pill-border":"#cfd8e8",
+    "--ui-board-bg-start":"#ffffff",
+    "--ui-board-bg-end":"#f8fbff",
+    "--ui-svg-bg":"#ffffff",
+    "--ui-svg-text":"#111",
+    "--ui-fret-line":"#333",
+    "--ui-string":"#444",
+    "--ui-dot":"#d9d9d9",
+    "--ui-footer":"#666",
+    "--ui-btn-grad-start":"#3f7df5",
+    "--ui-btn-grad-end":"#2f6fed",
+    "--note-stroke":"#cfd7e6",
+    "--note-stroke-strong":"#223047",
+    "--mk-red":"#e45757",
+    "--mk-green":"#2fbf9f",
+    "--mk-yellow":"#f2b84b",
+    "--fill-scale":"#e8f1ff",
+    "--fill-chord":"#ffe8cc",
+    "--fill-both":"#dff6ea",
+  },
+  dark: {
+    "--ui-text":"#e6ebff",
+    "--ui-title":"#f1f5ff",
+    "--ui-border":"#2f3940",
+    "--ui-muted":"#91a3c3",
+    "--ui-accent":"#6b8df2",
+    "--ui-accent-soft":"rgba(107,141,242,.28)",
+    "--ui-accent-strong":"#5a73bf",
+    "--ui-bg":"#0b0b0d",
+    "--ui-surface":"#171b22",
+    "--ui-surface-soft":"#12161d",
+    "--ui-body-grad-start":"#0f131a",
+    "--ui-body-grad-end":"#0b0b0d",
+    "--ui-panel-head-border":"#2f3940",
+    "--ui-panel-head-start":"#1b2230",
+    "--ui-panel-head-end":"#161c27",
+    "--ui-panel-title":"#dfe7ff",
+    "--ui-toggle-border":"#445472",
+    "--ui-toggle-text":"#cfd9ff",
+    "--ui-field-border":"#3a475f",
+    "--ui-field-bg":"#111722",
+    "--ui-field-text":"#e6ebff",
+    "--ui-pill-border":"#3a475f",
+    "--ui-board-bg-start":"#111722",
+    "--ui-board-bg-end":"#10151f",
+    "--ui-svg-bg":"#0f1520",
+    "--ui-svg-text":"#e7edff",
+    "--ui-fret-line":"#6f83b3",
+    "--ui-string":"#7d8cab",
+    "--ui-dot":"#6177aa",
+    "--ui-footer":"#9aa8ca",
+    "--ui-btn-grad-start":"#6b8df2",
+    "--ui-btn-grad-end":"#5a73bf",
+    "--note-stroke":"#5f739f",
+    "--note-stroke-strong":"#b7c8ef",
+    "--mk-red":"#ff7f82",
+    "--mk-green":"#64dfc5",
+    "--mk-yellow":"#ffd06b",
+    "--fill-scale":"#25385f",
+    "--fill-chord":"#5b4a2d",
+    "--fill-both":"#294d45",
+  },
 };
 
 const NOTE_CHOICES = [
@@ -606,6 +804,9 @@ const els = {
   viewEnd: document.getElementById("viewEnd"),
   showNoteNames: document.getElementById("showNoteNames"),
   accMode: document.getElementById("accMode"),
+  capoFret: document.getElementById("capoFret"),
+  capoHideLeftBtn: document.getElementById("capoHideLeftBtn"),
+  fretNumberMode: document.getElementById("fretNumberMode"),
 
   scaleType: document.getElementById("scaleType"),
   scaleRoot: document.getElementById("scaleRoot"),
@@ -622,6 +823,7 @@ const els = {
   colorYellow: document.getElementById("colorYellow"),
   clearMarksBtn: document.getElementById("clearMarksBtn"),
   copyLinkBtn: document.getElementById("copyLinkBtn"),
+  themePreset: document.getElementById("themePreset"),
 
   makePngBtn: document.getElementById("makePngBtn"),
 
@@ -632,13 +834,43 @@ const els = {
   sharePngBtn: document.getElementById("sharePngBtn"),
 
   board: document.getElementById("board"),
+  pageTitle: document.getElementById("pageTitle"),
   toggleBasic: document.getElementById("toggle-basic"),
+  toggleCapo: document.getElementById("toggle-capo"),
   toggleHighlight: document.getElementById("toggle-highlight"),
   toggleMarkshare: document.getElementById("toggle-markshare"),
 };
 
+document.title = APP_TITLE;
+if (els.pageTitle) els.pageTitle.textContent = APP_TITLE;
+
+function normalizeThemePreset(value){
+  // Backward compatibility for old saved style ids.
+  if (value === "ocean" || value === "nord" || value === "mint" || value === "studio"){
+    return "light";
+  }
+  if (value && THEME_PRESETS[value]) return value;
+  return "light";
+}
+
+function applyThemePreset(presetId){
+  const id = normalizeThemePreset(presetId);
+  const vars = THEME_PRESETS[id];
+  for (const [name, val] of Object.entries(vars)){
+    document.documentElement.style.setProperty(name, val);
+  }
+  if (els.themePreset && els.themePreset.value !== id) els.themePreset.value = id;
+}
+
+applyThemePreset(normalizeThemePreset(els.themePreset?.value));
+els.themePreset.addEventListener("change", () => {
+  applyThemePreset(els.themePreset.value);
+  drawFretboard();
+});
+
 const panelToggles = [
   { btn: els.toggleBasic, panel: document.getElementById("panel-basic"), head: els.toggleBasic.closest(".panelHead") },
+  { btn: els.toggleCapo, panel: document.getElementById("panel-capo"), head: els.toggleCapo.closest(".panelHead") },
   { btn: els.toggleHighlight, panel: document.getElementById("panel-highlight"), head: els.toggleHighlight.closest(".panelHead") },
   { btn: els.toggleMarkshare, panel: document.getElementById("panel-markshare"), head: els.toggleMarkshare.closest(".panelHead") },
 ];
@@ -648,6 +880,11 @@ function setPanelVisible(btn, panel, visible){
   btn.setAttribute("aria-expanded", visible ? "true" : "false");
   // Open: minus mark, Closed: down chevron
   btn.textContent = visible ? "－" : "▾";
+}
+
+function setCapoHideLeft(enabled){
+  els.capoHideLeftBtn.setAttribute("aria-pressed", enabled ? "true" : "false");
+  els.capoHideLeftBtn.textContent = enabled ? "カポより左を非表示: ON" : "カポより左を非表示: OFF";
 }
 
 function togglePanel(t){
@@ -671,6 +908,12 @@ for (const t of panelToggles){
   // Keep icons in sync with initial open/closed state.
   setPanelVisible(t.btn, t.panel, !t.panel.classList.contains("is-hidden"));
 }
+setCapoHideLeft(true);
+els.capoHideLeftBtn.addEventListener("click", () => {
+  const enabled = els.capoHideLeftBtn.getAttribute("aria-pressed") === "true";
+  setCapoHideLeft(!enabled);
+  drawFretboard();
+});
 
 // Tuning selects (input order: 6->1)
 const tuningLabels = ["6弦","5弦","4弦","3弦","2弦","1弦"];
@@ -809,6 +1052,13 @@ function drawFretboard(){
 
   const { viewStart, viewEnd } = clampViewRange();
   const mode = els.accMode.value;
+  const capoFret = Math.max(0, Math.min(12, Number(els.capoFret?.value ?? 0)));
+  const hideLeftOfCapo = (els.capoHideLeftBtn?.getAttribute("aria-pressed") === "true");
+  const fretNumberMode = els.fretNumberMode?.value ?? "absolute";
+  const relativeShift = (fretNumberMode === "relative" && capoFret > 0) ? (1 - capoFret) : 0;
+  const displayFretNum = (f) => String(f + relativeShift);
+  const renderStart = (hideLeftOfCapo && capoFret > 0) ? Math.max(viewStart, capoFret) : viewStart;
+  const showOpenArea = !(hideLeftOfCapo && capoFret > 0);
 
   const labelMode = normalizeShowNoteNames(els.showNoteNames.value);
 
@@ -843,14 +1093,14 @@ function drawFretboard(){
   const openX = nutX - cellW * 0.62;
 
   const boardH = 360;
-  const footerH = 24;
+  const footerH = 36;
   const yTop = topPad + 38;
   const yBottom = boardH - bottomPad;
   const stringGap = (yBottom - yTop) / 5;
 
   // Columns: only viewStart..viewEnd
   const visibleFrets = [];
-  for (let f=viewStart; f<=viewEnd; f++) visibleFrets.push(f);
+  for (let f=renderStart; f<=viewEnd; f++) visibleFrets.push(f);
 
   const colCount = visibleFrets.length;
   const width = nutX + (colCount * cellW) + rightPad;
@@ -865,11 +1115,11 @@ function drawFretboard(){
     "aria-label": "ギター指板"
   });
 
-  svg.appendChild(svgEl("rect", { x:0, y:0, width, height, fill:"#fff" }));
+  svg.appendChild(svgEl("rect", { x:0, y:0, width, height, fill:cssVar("--ui-svg-bg") }));
   fitBoardSvgSize(svg, width);
 
   // Labels: open
-  {
+  if (showOpenArea){
     const x0 = openX;
     svg.appendChild(svgEl("text", {
       x:x0, y:20, "text-anchor":"middle",
@@ -879,9 +1129,9 @@ function drawFretboard(){
 
     svg.appendChild(svgEl("text", {
       x:x0, y:42, "text-anchor":"middle",
-      "font-size": 14, "font-weight": 700, fill:"#111",
+      "font-size": 14, "font-weight": 700, fill:cssVar("--ui-svg-text"),
       "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
-    })).textContent = "0";
+    })).textContent = displayFretNum(0);
   }
 
   // Fret numbers (only visible)
@@ -894,9 +1144,9 @@ function drawFretboard(){
       x, y:42, "text-anchor":"middle",
       "font-size": isEm ? 15 : 14,
       "font-weight": isEm ? 700 : 600,
-      fill: isEm ? "#111" : cssVar("--ui-muted"),
+      fill: isEm ? cssVar("--ui-svg-text") : cssVar("--ui-muted"),
       "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
-    })).textContent = String(f);
+    })).textContent = displayFretNum(f);
   }
 
   // Nut
@@ -911,25 +1161,38 @@ function drawFretboard(){
     const x = nutX + (i+1) * cellW;
     svg.appendChild(svgEl("line", {
       x1:x, y1:yTop-14, x2:x, y2:yBottom+14,
-      stroke:"#333",
+      stroke: cssVar("--ui-fret-line"),
       "stroke-width": (f===12 ? 2.8 : 1.3),
       "stroke-linecap":"round"
     }));
   }
 
+  // Capo bar (SVG) on selected fret, if visible.
+  if (capoFret > 0 && capoFret >= renderStart && capoFret <= viewEnd){
+    const iCapo = capoFret - renderStart;
+    const xCapo = nutX + (iCapo + 1) * cellW;
+    svg.appendChild(svgEl("rect", {
+      x: xCapo - 4,
+      y: yTop - 14,
+      width: 8,
+      height: (yBottom - yTop) + 28,
+      fill: cssVar("--ui-svg-text")
+    }));
+  }
+
   // Position dots (only if within visible)
   for (const f of [3,5,7,9,12]){
-    if (f < viewStart || f > viewEnd) continue;
-    const i = f - viewStart;
+    if (f < renderStart || f > viewEnd) continue;
+    const i = f - renderStart;
     const x = nutX + (i + 0.5) * cellW;
     if (f===12){
       const y1 = yTop + stringGap * 1.6;
       const y2 = yTop + stringGap * 3.4;
-      svg.appendChild(svgEl("circle", { cx:x, cy:y1, r:5.2, fill:"#d9d9d9" }));
-      svg.appendChild(svgEl("circle", { cx:x, cy:y2, r:5.2, fill:"#d9d9d9" }));
+      svg.appendChild(svgEl("circle", { cx:x, cy:y1, r:5.2, fill:cssVar("--ui-dot") }));
+      svg.appendChild(svgEl("circle", { cx:x, cy:y2, r:5.2, fill:cssVar("--ui-dot") }));
     } else {
       const cy = (yTop+yBottom)/2;
-      svg.appendChild(svgEl("circle", { cx:x, cy:cy, r:5.2, fill:"#d9d9d9" }));
+      svg.appendChild(svgEl("circle", { cx:x, cy:cy, r:5.2, fill:cssVar("--ui-dot") }));
     }
   }
 
@@ -939,8 +1202,8 @@ function drawFretboard(){
     const stringNo = s + 1;
     const thick = 3.1 - (stringNo-1)*0.33;
     svg.appendChild(svgEl("line", {
-      x1: openX-18, y1:y, x2: nutX + colCount*cellW + 10, y2:y,
-      stroke:"#444", "stroke-width": Math.max(1.2, thick),
+      x1: showOpenArea ? (openX-18) : (nutX-10), y1:y, x2: nutX + colCount*cellW + 10, y2:y,
+      stroke: cssVar("--ui-string"), "stroke-width": Math.max(1.2, thick),
       "stroke-linecap":"round", opacity:0.95
     }));
   }
@@ -981,7 +1244,7 @@ function drawFretboard(){
     if (inScale && inChord) return fillBoth;
     if (inChord) return fillChord;
     if (inScale) return fillScale;
-    return "#fff";
+    return cssVar("--ui-svg-bg");
   }
   function markerColor(color){
     if (color==="green") return cssVar("--mk-green");
@@ -996,13 +1259,14 @@ function drawFretboard(){
   const showMarkers = (els.drawMode.value === "on");
 
   // OPEN (fret 0) + visible frets
-  const fretsToRender = [0, ...visibleFrets];
+  const fretsToRender = showOpenArea ? [0, ...visibleFrets] : [...visibleFrets];
 
   for (let s=0; s<6; s++){
     const y = yTop + s * stringGap;
     const base = idx(strings[s].open);
 
     for (const f of fretsToRender){
+      // Absolute pitch on the fretboard does not change with capo.
       const noteIndex = (base + f) % 12;
       const noteSharp = NOTES[noteIndex];
 
@@ -1010,7 +1274,7 @@ function drawFretboard(){
       if (f === 0){
         x = openX;
       } else {
-        const i = f - viewStart; // 0..colCount-1
+        const i = f - renderStart; // 0..colCount-1
         x = nutX + (i + 0.5) * cellW;
       }
 
@@ -1020,6 +1284,10 @@ function drawFretboard(){
       let sw = normalSW;
 
       if (f === 0){
+        stroke = cssVar("--note-stroke-strong");
+        sw = openSW;
+      } else if (capoFret > 0 && f === capoFret){
+        // Emphasize capo position similar to open strings.
         stroke = cssVar("--note-stroke-strong");
         sw = openSW;
       } else if (f === 12){
@@ -1043,7 +1311,7 @@ function drawFretboard(){
           "text-anchor":"middle",
           "font-size": noteFontSize,
           "font-weight": 600,
-          fill:"#111",
+          fill:cssVar("--ui-svg-text"),
           "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
         });
         text.textContent = displayText;
@@ -1059,7 +1327,7 @@ function drawFretboard(){
           svg.appendChild(svgEl("circle", {
             cx:x, cy:y, r: markerR,
             fill:"none",
-            stroke:"#fff",
+            stroke:cssVar("--ui-svg-bg"),
             "stroke-width": markerWhiteSW,
             "stroke-linecap":"round"
           }));
@@ -1079,7 +1347,7 @@ function drawFretboard(){
             x:x0, y:y0, width:side, height:side,
             rx:6.5, ry:6.5,
             fill:"none",
-            stroke:"#fff",
+            stroke:cssVar("--ui-svg-bg"),
             "stroke-width": markerWhiteSW,
             "stroke-linejoin":"round"
           }));
@@ -1134,14 +1402,23 @@ function drawFretboard(){
     }
   }
 
-  // Footer credit (included in PNG export), placed below the fretboard area.
+  // Footer title + credit (included in PNG export), 2-line layout at bottom-right.
+  svg.appendChild(svgEl("text", {
+    x: width - 14,
+    y: boardH + 14,
+    "text-anchor":"end",
+    "font-size": 9.8,
+    "font-weight": 500,
+    fill:cssVar("--ui-footer"),
+    "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
+  })).textContent = APP_TITLE;
   svg.appendChild(svgEl("text", {
     x: width - 14,
     y: boardH + footerH - 8,
     "text-anchor":"end",
-    "font-size": 10.5,
+    "font-size": 9.8,
     "font-weight": 500,
-    fill:"#777",
+    fill:cssVar("--ui-footer"),
     "font-family": '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif'
   })).textContent = "© 2026 Yurito. All rights reserved.";
 
@@ -1306,6 +1583,10 @@ function getState(){
     tuning,
     viewStart,
     viewEnd,
+    capoFret: els.capoFret.value,
+    capoHideLeft: (els.capoHideLeftBtn.getAttribute("aria-pressed") === "true"),
+    fretNumberMode: els.fretNumberMode.value,
+    themePreset: normalizeThemePreset(els.themePreset.value),
     showNoteNames: els.showNoteNames.value,
     accMode: els.accMode.value,
     scaleType: els.scaleType.value,
@@ -1331,6 +1612,13 @@ function applyState(st){
     }
     if (Number.isFinite(st.viewStart)) els.viewStart.value = String(st.viewStart);
     if (Number.isFinite(st.viewEnd)) els.viewEnd.value = String(st.viewEnd);
+    if (st.capoFret !== undefined) els.capoFret.value = String(st.capoFret);
+    if (st.capoHideLeft !== undefined){
+      const enabled = (typeof st.capoHideLeft === "boolean") ? st.capoHideLeft : (st.capoHideLeft === "on");
+      setCapoHideLeft(enabled);
+    }
+    if (st.fretNumberMode) els.fretNumberMode.value = st.fretNumberMode;
+    if (st.themePreset) applyThemePreset(st.themePreset);
 
     if (st.showNoteNames) els.showNoteNames.value = normalizeShowNoteNames(st.showNoteNames);
     if (st.accMode) els.accMode.value = st.accMode;
@@ -1397,7 +1685,7 @@ els.copyLinkBtn.addEventListener("click", async () => {
    Redraw triggers
 ========================= */
 [
-  els.viewStart, els.viewEnd,
+  els.viewStart, els.viewEnd, els.capoFret, els.fretNumberMode,
   els.accMode, els.showNoteNames,
   els.scaleType, els.scaleRoot,
   els.chordOn, els.chordRoot, els.chordQuality,
